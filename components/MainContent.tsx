@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
-import { Search, X, Download, ExternalLink, ArrowRight, Layers, Box, Type, Grid, MoveUpRight, Zap } from 'lucide-react';
+import { Search, X, ExternalLink, ArrowRight, Box, Type, MoveUpRight, Zap } from 'lucide-react';
 
 // --- 1. Urban Design Dummy Data ---
 
@@ -112,7 +112,7 @@ const RESOURCES: Resource[] = [
 
 const VIBES: Vibe[] = ['All', 'Cyberpunk', 'Brutalist', 'Glassmorphism', 'Minimalist'];
 
-// --- 2. Custom Cursor Component ---
+// --- 2. Shared Components (Defined BEFORE usage) ---
 
 const CustomCursor = ({ colorHex }: { colorHex: string | null }) => {
   const mouseX = useMotionValue(0);
@@ -153,8 +153,6 @@ const CustomCursor = ({ colorHex }: { colorHex: string | null }) => {
     </motion.div>
   );
 };
-
-// --- 3. Sub-Components ---
 
 const FilterBar = ({ activeVibe, setActiveVibe }: { activeVibe: Vibe, setActiveVibe: (v: Vibe) => void }) => {
   return (
@@ -200,81 +198,6 @@ const FilterBar = ({ activeVibe, setActiveVibe }: { activeVibe: Vibe, setActiveV
   );
 };
 
-// --- 4. Main Component ---
-
-const MainContent: React.FC = () => {
-  const [activeVibe, setActiveVibe] = useState<Vibe>('All');
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [cursorColor, setCursorColor] = useState<string | null>(null);
-
-  // Filter Data
-  const filteredResources = activeVibe === 'All' 
-    ? RESOURCES 
-    : RESOURCES.filter(r => r.vibe === activeVibe);
-
-  // Prevent scroll when portal is open
-  useEffect(() => {
-    if (selectedId) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-  }, [selectedId]);
-
-  return (
-    <div className="relative w-full min-h-screen bg-[#060606] cursor-none">
-      <CustomCursor colorHex={cursorColor} />
-
-      {/* Background Texture */}
-      <div 
-        className="fixed inset-0 opacity-[0.03] pointer-events-none z-0"
-        style={{
-          backgroundImage: `linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)`,
-          backgroundSize: '40px 40px'
-        }}
-      />
-
-      <FilterBar activeVibe={activeVibe} setActiveVibe={setActiveVibe} />
-
-      <section className="relative z-10 max-w-7xl mx-auto px-6 py-12 min-h-[80vh]">
-        <motion.div 
-          layout
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-        >
-          <AnimatePresence mode='popLayout'>
-            {filteredResources.map((resource) => (
-              <BentoCard 
-                key={resource.id} 
-                resource={resource} 
-                onClick={() => setSelectedId(resource.id)}
-                onHoverStart={() => setCursorColor(resource.hex)}
-                onHoverEnd={() => setCursorColor(null)}
-              />
-            ))}
-          </AnimatePresence>
-        </motion.div>
-      </section>
-
-      {/* Portal Overlay */}
-      <AnimatePresence>
-        {selectedId && (
-          <DetailPortal 
-            id={selectedId} 
-            onClose={() => {
-              setSelectedId(null);
-              setCursorColor(null);
-            }} 
-          />
-        )}
-      </AnimatePresence>
-
-      <UrbanFooter />
-    </div>
-  );
-};
-
-// --- 5. Bento Card Component ---
-
 interface BentoCardProps {
   resource: Resource;
   onClick: () => void;
@@ -305,7 +228,7 @@ const BentoCard: React.FC<BentoCardProps> = ({
       transition={{ duration: 0.4 }}
       className={`
         group relative ${spanClass} rounded-3xl overflow-hidden cursor-none
-        bg-[#111111] border border-white/10
+        bg-[#111111] border border-white/10 h-full min-h-[300px]
       `}
     >
       {/* Dynamic Hover Border */}
@@ -319,7 +242,7 @@ const BentoCard: React.FC<BentoCardProps> = ({
         <img 
           src={resource.image} 
           alt={resource.title} 
-          className="w-full h-full object-cover opacity-60 group-hover:opacity-80 group-hover:scale-105 transition-all duration-700"
+          className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
       </motion.div>
@@ -353,8 +276,6 @@ const BentoCard: React.FC<BentoCardProps> = ({
     </motion.div>
   );
 };
-
-// --- 6. Detail Portal Component (The "Portal" Effect) ---
 
 const DetailPortal = ({ id, onClose }: { id: string, onClose: () => void }) => {
   const resource = RESOURCES.find(r => r.id === id);
@@ -454,8 +375,6 @@ const DetailPortal = ({ id, onClose }: { id: string, onClose: () => void }) => {
   );
 };
 
-// --- 7. Urban Footer ---
-
 const UrbanFooter = () => (
   <footer className="relative bg-black pt-32 pb-12 border-t border-white/10 overflow-hidden">
     <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -498,5 +417,78 @@ const UrbanFooter = () => (
     `}</style>
   </footer>
 );
+
+// --- 3. Main Component ---
+
+const MainContent: React.FC = () => {
+  const [activeVibe, setActiveVibe] = useState<Vibe>('All');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [cursorColor, setCursorColor] = useState<string | null>(null);
+
+  // Filter Data
+  const filteredResources = activeVibe === 'All' 
+    ? RESOURCES 
+    : RESOURCES.filter(r => r.vibe === activeVibe);
+
+  // Prevent scroll when portal is open
+  useEffect(() => {
+    if (selectedId) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+  }, [selectedId]);
+
+  return (
+    <div className="relative w-full min-h-screen bg-[#060606] cursor-none">
+      <CustomCursor colorHex={cursorColor} />
+
+      {/* Background Texture */}
+      <div 
+        className="fixed inset-0 opacity-[0.03] pointer-events-none z-0"
+        style={{
+          backgroundImage: `linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)`,
+          backgroundSize: '40px 40px'
+        }}
+      />
+
+      <FilterBar activeVibe={activeVibe} setActiveVibe={setActiveVibe} />
+
+      <section className="relative z-10 max-w-7xl mx-auto px-6 py-12 min-h-[80vh]">
+        <motion.div 
+          layout
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-[300px]"
+        >
+          <AnimatePresence mode='popLayout'>
+            {filteredResources.map((resource) => (
+              <BentoCard 
+                key={resource.id} 
+                resource={resource} 
+                onClick={() => setSelectedId(resource.id)}
+                onHoverStart={() => setCursorColor(resource.hex)}
+                onHoverEnd={() => setCursorColor(null)}
+              />
+            ))}
+          </AnimatePresence>
+        </motion.div>
+      </section>
+
+      {/* Portal Overlay */}
+      <AnimatePresence>
+        {selectedId && (
+          <DetailPortal 
+            id={selectedId} 
+            onClose={() => {
+              setSelectedId(null);
+              setCursorColor(null);
+            }} 
+          />
+        )}
+      </AnimatePresence>
+
+      <UrbanFooter />
+    </div>
+  );
+};
 
 export default MainContent;
