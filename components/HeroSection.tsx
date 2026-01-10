@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Matter from 'matter-js';
 import { motion } from 'framer-motion';
 import { ArrowDown, Search, Menu, Zap, Users } from 'lucide-react';
@@ -70,10 +70,11 @@ const HeroSection: React.FC = () => {
         showAngleIndicator: false,
       },
     });
+    // Ensure the render canvas doesn't block anything
     render.canvas.style.position = 'absolute';
     render.canvas.style.top = '0';
     render.canvas.style.left = '0';
-    render.canvas.style.pointerEvents = 'none';
+    render.canvas.style.pointerEvents = 'none'; 
     render.canvas.style.opacity = '0';
     renderRef.current = render;
 
@@ -122,7 +123,6 @@ const HeroSection: React.FC = () => {
     Matter.Composite.add(world, tagBodies);
 
     // 5. Mouse Interaction
-    // We attach the mouse to the containerRef (main wrapper) so it captures events bubbling from the buttons
     const mouse = Matter.Mouse.create(containerRef.current);
     const mouseConstraint = Matter.MouseConstraint.create(engine, {
       mouse: mouse,
@@ -134,16 +134,29 @@ const HeroSection: React.FC = () => {
       },
     });
 
-    // Remove scrolling interference
-    // @ts-ignore
-    mouseConstraint.mouse.element.removeEventListener("mousewheel", mouseConstraint.mouse.mousewheel);
-    // @ts-ignore
-    mouseConstraint.mouse.element.removeEventListener("DOMMouseScroll", mouseConstraint.mouse.mousewheel);
+    // --- CRITICAL FIX FOR SCROLLING ---
+    // Matter.js by default captures scroll events to prevent page scrolling when interacting with canvas.
+    // We MUST remove these listeners to allow Lenis/Native scroll to work.
+    
+    // 1. Remove specific Matter listeners
+    // @ts-ignore - access internal element
+    const element = mouse.element;
+    // @ts-ignore - access internal mousewheel handler
+    const mousewheelHandler = mouse.mousewheel;
+
+    if (element && mousewheelHandler) {
+      element.removeEventListener("mousewheel", mousewheelHandler);
+      element.removeEventListener("DOMMouseScroll", mousewheelHandler);
+      // Modern browsers might use 'wheel'
+      element.removeEventListener("wheel", mousewheelHandler);
+    }
+    
+    // 2. Ensure the pixel ratio is correct for the mouse
+    mouse.pixelRatio = window.devicePixelRatio || 1;
 
     // Add "Throw" Effect
     Matter.Events.on(mouseConstraint, "enddrag", (e) => {
       if (e.body) {
-        // Amplify velocity on release to simulate a strong throw
         Matter.Body.setVelocity(e.body, {
           x: e.body.velocity.x * 3, 
           y: e.body.velocity.y * 3
@@ -222,7 +235,6 @@ const HeroSection: React.FC = () => {
     // Only trigger click if moved less than 10 pixels
     if (dist < 10) {
       console.log(`Navigate to: ${tagLabel}`);
-      // Visual feedback or navigation could go here
     }
     
     clickStartRef.current = null;
@@ -232,7 +244,9 @@ const HeroSection: React.FC = () => {
     <div 
       ref={containerRef} 
       className="relative w-full h-screen overflow-hidden bg-[#060606] font-sans selection:bg-white selection:text-black"
+      style={{ touchAction: 'pan-y' }} // CRITICAL: Allow vertical scroll on touch
     >
+      {/* ... Navbar and other static content ... */}
       
       {/* --- Navbar (Overlay) --- */}
       <nav className="absolute top-0 left-0 w-full z-50 flex items-center justify-between px-8 py-6 pointer-events-none">

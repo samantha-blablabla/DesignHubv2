@@ -8,23 +8,48 @@
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap');
       
+      html.lenis, html.lenis body {
+        height: auto;
+      }
+
+      .lenis.lenis-smooth {
+        scroll-behavior: auto !important;
+      }
+
+      .lenis.lenis-smooth [data-lenis-prevent] {
+        overscroll-behavior: contain;
+      }
+
+      .lenis.lenis-stopped {
+        overflow: hidden;
+      }
+
+      .lenis.lenis-scrolling iframe {
+        pointer-events: none;
+      }
+
       body {
         font-family: 'Bricolage Grotesque', sans-serif;
         background-color: #060606;
         margin: 0;
+        /* Revert overflow-x: hidden on body if it conflicts, but usually needed for x-overflow prevention */
         overflow-x: hidden;
+        cursor: default;
       }
 
-      /* Hide scrollbar for cleaner UI */
+      /* Custom Neon Scrollbar */
       ::-webkit-scrollbar {
-        width: 8px;
+        width: 6px;
       }
       ::-webkit-scrollbar-track {
         background: #060606;
       }
       ::-webkit-scrollbar-thumb {
-        background: #1e293b;
+        background: #eab308; /* Yellow-500 */
         border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #facc15;
       }
     </style>
   <script type="importmap">
@@ -35,7 +60,8 @@
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
     "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
     "framer-motion": "https://esm.sh/framer-motion@^12.25.0",
-    "matter-js": "https://esm.sh/matter-js@^0.20.0"
+    "matter-js": "https://esm.sh/matter-js@^0.20.0",
+    "lenis": "https://esm.sh/@studio-freight/lenis@1.0.42"
   }
 }
 </script>

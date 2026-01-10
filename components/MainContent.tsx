@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useMotionValue, useSpring, useScroll, useTransform } from 'framer-motion';
 import { Search, X, ExternalLink, ArrowRight, Box, Type, MoveUpRight, Zap } from 'lucide-react';
+import { useLenis } from './ScrollWrapper';
 
 // --- 1. Urban Design Dummy Data ---
 
@@ -203,29 +204,47 @@ interface BentoCardProps {
   onClick: () => void;
   onHoverStart: () => void;
   onHoverEnd: () => void;
+  index: number;
 }
 
 const BentoCard: React.FC<BentoCardProps> = ({ 
   resource, 
   onClick, 
   onHoverStart, 
-  onHoverEnd 
+  onHoverEnd,
+  index
 }) => {
   const spanClass = 
     resource.size === 'large' ? 'md:col-span-2 md:row-span-2' : 
     resource.size === 'tall' ? 'md:row-span-2' : 
     'col-span-1';
 
+  // Parallax Logic
+  const ref = useRef(null);
+  
+  // Track scroll of the WINDOW since that is what Lenis moves
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"]
+  });
+  
+  // Enhanced Parallax: Staggered movement based on column index
+  // Even items move slower, odd items move faster to create 'disjointed' depth
+  const parallaxStrength = index % 2 === 0 ? 50 : 120;
+  const y = useTransform(scrollYProgress, [0, 1], [0, -parallaxStrength]);
+
   return (
     <motion.div
+      ref={ref}
       layoutId={`card-${resource.id}`}
       onClick={onClick}
       onMouseEnter={onHoverStart}
       onMouseLeave={onHoverEnd}
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ duration: 0.4 }}
+      style={{ y }} 
+      initial={{ opacity: 0, y: 100 }} 
+      whileInView={{ opacity: 1, y: 0 }} 
+      viewport={{ once: true, margin: "0px 0px -100px 0px" }} // Trigger reveal slightly later
+      transition={{ duration: 0.7, ease: "easeOut" }} 
       className={`
         group relative ${spanClass} rounded-3xl overflow-hidden cursor-none
         bg-[#111111] border border-white/10 h-full min-h-[300px]
@@ -279,6 +298,14 @@ const BentoCard: React.FC<BentoCardProps> = ({
 
 const DetailPortal = ({ id, onClose }: { id: string, onClose: () => void }) => {
   const resource = RESOURCES.find(r => r.id === id);
+  const { stopScroll, startScroll } = useLenis();
+
+  // Lock scroll when portal is open
+  useEffect(() => {
+    stopScroll();
+    return () => startScroll();
+  }, [stopScroll, startScroll]);
+
   if (!resource) return null;
 
   return (
@@ -430,15 +457,6 @@ const MainContent: React.FC = () => {
     ? RESOURCES 
     : RESOURCES.filter(r => r.vibe === activeVibe);
 
-  // Prevent scroll when portal is open
-  useEffect(() => {
-    if (selectedId) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-  }, [selectedId]);
-
   return (
     <div className="relative w-full min-h-screen bg-[#060606] cursor-none">
       <CustomCursor colorHex={cursorColor} />
@@ -460,9 +478,10 @@ const MainContent: React.FC = () => {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-[300px]"
         >
           <AnimatePresence mode='popLayout'>
-            {filteredResources.map((resource) => (
+            {filteredResources.map((resource, index) => (
               <BentoCard 
                 key={resource.id} 
+                index={index}
                 resource={resource} 
                 onClick={() => setSelectedId(resource.id)}
                 onHoverStart={() => setCursorColor(resource.hex)}
