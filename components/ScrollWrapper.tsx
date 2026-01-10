@@ -30,21 +30,20 @@ export const ScrollWrapper: React.FC<PropsWithChildren> = ({ children }) => {
   });
 
   useEffect(() => {
-    // Initialize Lenis
+    // Initialize Lenis with "Premium" Settings
     const lenisInstance = new Lenis({
       duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Ease Out Quart-ish
-      direction: 'vertical',
-      gestureDirection: 'vertical',
-      smooth: true,
-      mouseMultiplier: 1,
-      smoothTouch: false,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      smoothWheel: true,
+      wheelMultiplier: 1,
       touchMultiplier: 2,
+      lerp: 0.1, // Task 3: Smoothness
     });
 
     setLenis(lenisInstance);
 
-    // RAF Loop
     function raf(time: number) {
       lenisInstance.raf(time);
       requestAnimationFrame(raf);
@@ -59,7 +58,6 @@ export const ScrollWrapper: React.FC<PropsWithChildren> = ({ children }) => {
   const stopScroll = () => {
     if (lenis) {
       lenis.stop();
-      // Also lock body to be safe, though Lenis stop usually handles the logic
       document.body.style.overflow = 'hidden';
     }
   };
