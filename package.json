@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.90.1",
+    "@tailwindcss/postcss": "^4.1.18",
     "@types/matter-js": "^0.20.2",
     "autoprefixer": "^10.4.23",
     "framer-motion": "^12.25.0",

@@ -3,6 +3,8 @@ import CustomCursor from './components/CustomCursor';
 import { ScrollWrapper } from './components/ScrollWrapper';
 import NoiseOverlay from './components/NoiseOverlay';
 import HeroSection from './components/HeroSection';
+import ResourceGallery from './components/ResourceGallery';
+import VideoShowcase from './components/VideoShowcase';
 
 function App() {
   return (
@@ -12,6 +14,8 @@ function App() {
           <CustomCursor />
           <NoiseOverlay />
           <HeroSection />
+          <ResourceGallery />
+          <VideoShowcase />
         </div>
       </ScrollWrapper>
     </CursorProvider>
