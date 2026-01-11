@@ -7,7 +7,9 @@
       "Bash(git remote add:*)",
       "Bash(git push:*)",
       "Bash(git rm:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(taskkill:*)",
+      "Bash(powershell -Command \"Get-Process -Name node -ErrorAction SilentlyContinue | Stop-Process -Force\")"
     ]
   }
 }
