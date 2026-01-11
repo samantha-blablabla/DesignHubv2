@@ -2,44 +2,10 @@ import React, { useRef, useState, useEffect } from 'react';
 import { motion, useInView, useSpring, useTransform } from 'framer-motion';
 import { useCursor } from './CursorContext';
 import { Play, Pause, Volume2, VolumeX, Maximize2, ArrowUpRight } from 'lucide-react';
-
-const VIDEOS = [
-  {
-    id: 1,
-    title: 'Kinetic Typography',
-    duration: '00:12',
-    thumb: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop',
-    video: 'https://assets.mixkit.co/videos/preview/mixkit-ink-swirling-in-water-196-large.mp4',
-    link: '#project-kinetic', // Placeholder link
-  },
-  {
-    id: 2,
-    title: 'Fluid Simulations',
-    duration: '00:08',
-    thumb: 'https://images.unsplash.com/photo-1604533038676-e82df491c10d?q=80&w=1000&auto=format&fit=crop',
-    video: 'https://assets.mixkit.co/videos/preview/mixkit-holographic-fluid-surface-loop-2747-large.mp4',
-    link: '#project-fluid',
-  },
-  {
-    id: 3,
-    title: 'Abstract Data',
-    duration: '00:15',
-    thumb: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop',
-    video: 'https://assets.mixkit.co/videos/preview/mixkit-abstract-technology-network-lines-2766-large.mp4',
-    link: '#project-data',
-  },
-  {
-    id: 4,
-    title: 'Cyber Particles',
-    duration: '00:10',
-    thumb: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop',
-    video: 'https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-blue-particles-4618-large.mp4',
-    link: '#project-particles',
-  },
-];
+import { supabase, type MotionAsset } from '../lib/supabase';
 
 interface VideoItemProps {
-  item: typeof VIDEOS[0];
+  item: MotionAsset;
   isHovered: boolean;
   isAnyHovered: boolean;
   onHoverStart: () => void;
@@ -187,6 +153,30 @@ const VideoItem: React.FC<VideoItemProps> = ({ item, isHovered, isAnyHovered, on
 
 const SmartVideoGallery = () => {
   const [hoveredId, setHoveredId] = useState<number | null>(null);
+  const [videos, setVideos] = useState<MotionAsset[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // === CLAUDE CODE: Fetch motion assets from Supabase ===
+  useEffect(() => {
+    async function fetchMotionAssets() {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('motion_assets')
+          .select('*')
+          .order('id', { ascending: true });
+
+        if (error) throw error;
+        if (data) setVideos(data as MotionAsset[]);
+      } catch (error) {
+        console.error('Error fetching motion assets:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchMotionAssets();
+  }, []);
 
   return (
     <section className="w-full py-12 md:py-24 px-6 bg-[#060606] overflow-hidden">
@@ -204,19 +194,35 @@ const SmartVideoGallery = () => {
             </p>
         </div>
 
-        {/* Gallery Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-          {VIDEOS.map((video) => (
-            <VideoItem 
-                key={video.id} 
-                item={video} 
-                isHovered={hoveredId === video.id}
-                isAnyHovered={hoveredId !== null}
-                onHoverStart={() => setHoveredId(video.id)}
-                onHoverEnd={() => setHoveredId(null)}
-            />
-          ))}
-        </div>
+        {/* Loading State */}
+        {loading ? (
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : (
+          <>
+            {/* Gallery Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+              {videos.map((video) => (
+                <VideoItem
+                    key={video.id}
+                    item={video}
+                    isHovered={hoveredId === video.id}
+                    isAnyHovered={hoveredId !== null}
+                    onHoverStart={() => setHoveredId(video.id)}
+                    onHoverEnd={() => setHoveredId(null)}
+                />
+              ))}
+            </div>
+
+            {/* Empty State */}
+            {!loading && videos.length === 0 && (
+              <div className="text-center py-16">
+                <p className="text-slate-500 text-lg">No motion assets found.</p>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </section>
   );
