@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Matter from 'matter-js';
 import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { ArrowDown, Search, Menu, Zap, Users } from 'lucide-react';
+import { useCursor } from './CursorContext';
 
 // --- Types & Constants ---
 
@@ -45,29 +46,20 @@ const MagneticButton: React.FC<MagneticButtonProps> = ({ children, className = "
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
-  // Snappy but smooth physics
   const springConfig = { stiffness: 150, damping: 15, mass: 0.1 };
   const springX = useSpring(x, springConfig);
   const springY = useSpring(y, springConfig);
 
-  // Text/Icon moves slightly more for a layered 3D depth effect
   const textX = useTransform(springX, (latest) => latest * 0.1);
   const textY = useTransform(springY, (latest) => latest * 0.1);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!ref.current) return;
-    const { clientX, clientY } = e;
     const { left, top, width, height } = ref.current.getBoundingClientRect();
-    
     const centerX = left + width / 2;
     const centerY = top + height / 2;
-    
-    const distanceX = clientX - centerX;
-    const distanceY = clientY - centerY;
-
-    // Pull factor: 0.35 means button travels 35% of the distance to the mouse
-    x.set(distanceX * 0.35);
-    y.set(distanceY * 0.35);
+    x.set((e.clientX - centerX) * 0.35);
+    y.set((e.clientY - centerY) * 0.35);
   };
 
   const handleMouseLeave = () => {
@@ -96,19 +88,16 @@ const HeroSection: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<Matter.Engine | null>(null);
-  const renderRef = useRef<Matter.Render | null>(null);
   const runnerRef = useRef<Matter.Runner | null>(null);
   const tagsRef = useRef<Map<string, HTMLDivElement>>(new Map());
   const clickStartRef = useRef<{x: number, y: number} | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const { setCursor } = useCursor();
 
   // --- Parallax Hooks ---
   const { scrollY } = useScroll();
-  // Text moves down slower (0 -> 200)
   const textY = useTransform(scrollY, [0, 500], [0, 200]);
-  // Tags move up faster (0 -> -150)
   const tagsY = useTransform(scrollY, [0, 500], [0, -150]);
-  // Fade text out
   const textOpacity = useTransform(scrollY, [0, 300], [1, 0]);
 
   useEffect(() => {
@@ -118,8 +107,11 @@ const HeroSection: React.FC = () => {
     const engine = Matter.Engine.create();
     const world = engine.world;
     engineRef.current = engine;
+    
+    // Disable gravity initially for staggered reveal
+    engine.gravity.y = 0;
 
-    // 2. Setup Render (Visual Debugging - Hidden but structurally kept)
+    // 2. Setup Render (Hidden)
     const render = Matter.Render.create({
       element: sceneRef.current,
       engine: engine,
@@ -128,16 +120,10 @@ const HeroSection: React.FC = () => {
         height: window.innerHeight,
         background: 'transparent',
         wireframes: false, 
-        showAngleIndicator: false,
       },
     });
-    // Visual canvas pointer-events: none (Task 1)
     render.canvas.style.pointerEvents = 'none';
-    render.canvas.style.position = 'absolute';
-    render.canvas.style.top = '0';
-    render.canvas.style.left = '0';
-    render.canvas.style.opacity = '0'; 
-    renderRef.current = render;
+    render.canvas.style.opacity = '0';
 
     // 3. Boundaries
     const ground = Matter.Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 50, window.innerWidth, 100, { isStatic: true });
@@ -145,10 +131,10 @@ const HeroSection: React.FC = () => {
     const wallRight = Matter.Bodies.rectangle(window.innerWidth + 50, window.innerHeight / 2, 100, window.innerHeight, { isStatic: true });
     Matter.Composite.add(world, [ground, wallLeft, wallRight]);
 
-    // 4. Bodies
+    // 4. Bodies (Positioned high initially)
     const tagBodies = TAGS.map((tag) => {
       const x = Math.random() * (window.innerWidth - 200) + 100;
-      const y = -Math.random() * 500 - 100; 
+      const y = -Math.random() * 500 - 200; // Start higher
       return Matter.Bodies.rectangle(x, y, tag.width, TAG_HEIGHT, {
         chamfer: { radius: CHAMFER_RADIUS },
         restitution: 0.8,
@@ -159,18 +145,14 @@ const HeroSection: React.FC = () => {
     });
     Matter.Composite.add(world, tagBodies);
 
-    // 5. Mouse Interaction - The Key Scroll Fix
+    // 5. Mouse Interaction
     const mouse = Matter.Mouse.create(document.body); 
     const mouseConstraint = Matter.MouseConstraint.create(engine, {
       mouse: mouse,
-      constraint: {
-        stiffness: 0.2,
-        render: { visible: false },
-      },
+      constraint: { stiffness: 0.2, render: { visible: false } },
     });
 
-    // FORCE WHEEL PASS-THROUGH
-    // Explicitly remove all scroll-blocking listeners from Matter.js
+    // Clean mouse events
     // @ts-ignore
     mouse.element.removeEventListener("mousewheel", mouse.mousewheel);
     // @ts-ignore
@@ -180,13 +162,17 @@ const HeroSection: React.FC = () => {
 
     Matter.Composite.add(world, mouseConstraint);
 
-    // 6. Run
+    // 6. Run & Sync
     const runner = Matter.Runner.create();
     Matter.Runner.run(runner, engine);
     Matter.Render.run(render);
     runnerRef.current = runner;
 
-    // 7. Sync Loop
+    // Staggered Gravity Enable
+    setTimeout(() => {
+        engine.gravity.y = 1;
+    }, 1200);
+
     const updateLoop = () => {
       if (!engineRef.current) return;
       tagBodies.forEach((body) => {
@@ -194,14 +180,9 @@ const HeroSection: React.FC = () => {
         if (domNode) {
           const { x, y } = body.position;
           const rotation = body.angle;
-
-          // Find the tag to get its width
           const tag = TAGS.find(t => t.id === body.label);
           if (tag) {
-            const w = tag.width;
-            const h = TAG_HEIGHT;
-            // Simplified position mapping logic (Center based)
-            domNode.style.transform = `translate(${x - w / 2}px, ${y - h / 2}px) rotate(${rotation}rad)`;
+            domNode.style.transform = `translate(${x - tag.width / 2}px, ${y - TAG_HEIGHT / 2}px) rotate(${rotation}rad)`;
           }
         }
       });
@@ -210,7 +191,6 @@ const HeroSection: React.FC = () => {
     const animationId = requestAnimationFrame(updateLoop);
     setIsLoaded(true);
 
-    // 8. Resize
     const handleResize = () => {
       render.canvas.width = window.innerWidth;
       render.canvas.height = window.innerHeight;
@@ -245,61 +225,81 @@ const HeroSection: React.FC = () => {
     <div 
       ref={containerRef} 
       className="relative w-full h-screen overflow-hidden bg-[#060606] font-sans"
-      style={{ 
-        touchAction: 'pan-y',
-        pointerEvents: 'none' // Container ignores events, allowing scroll through
-      }} 
+      style={{ touchAction: 'pan-y', pointerEvents: 'none' }} 
     >
-      
-      {/* Navbar - Needs pointer events back */}
       <nav className="absolute top-0 left-0 w-full z-50 flex items-center justify-between px-8 py-6 pointer-events-none">
-        <div className="flex items-center gap-2 pointer-events-auto cursor-pointer">
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="flex items-center gap-2 pointer-events-auto cursor-pointer"
+        >
           <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
              <Zap className="w-5 h-5 text-black fill-current" />
           </div>
           <span className="text-xl font-bold tracking-tight text-white">DesignHub</span>
-        </div>
-        <div className="hidden md:flex items-center gap-8 pointer-events-auto">
+        </motion.div>
+        
+        <motion.div 
+           initial={{ opacity: 0, y: -20 }} 
+           animate={{ opacity: 1, y: 0 }} 
+           transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
+           className="hidden md:flex items-center gap-8 pointer-events-auto"
+        >
           <a href="#" className="text-sm font-semibold text-slate-400 hover:text-white transition-colors">Resources</a>
           <a href="#" className="text-sm font-semibold text-slate-400 hover:text-white transition-colors">Community</a>
           <button className="p-2 text-white bg-white/10 hover:bg-white/20 rounded-full transition-colors backdrop-blur-sm border border-white/5">
              <Search className="w-5 h-5" />
           </button>
-        </div>
+        </motion.div>
       </nav>
 
-      {/* Background - purely visual */}
-      <div ref={sceneRef} className="absolute inset-0 z-0 pointer-events-none">
+      {/* Grid Pattern Reveal */}
+      <motion.div 
+        ref={sceneRef} 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 2, ease: "easeIn" }}
+        className="absolute inset-0 z-0 pointer-events-none"
+      >
         <div 
-          className="absolute inset-0 opacity-[0.03]"
+          className="absolute inset-0 opacity-[0.04]"
           style={{
             backgroundImage: `linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)`,
             backgroundSize: '40px 40px'
           }}
         />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-blue-900/10 rounded-full blur-[120px] opacity-30" />
-      </div>
+      </motion.div>
 
-      {/* Hero Text - Wrapped in Parallax Motion Div */}
+      {/* Hero Text Reveal */}
       <motion.div 
         style={{ y: textY, opacity: textOpacity }}
         className="absolute inset-0 z-0 flex flex-col items-center justify-center pointer-events-none"
       >
         <div className="text-center px-4 max-w-4xl mt-12 md:mt-0">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          >
              <h2 className="text-white/60 font-semibold tracking-wide uppercase text-xs md:text-sm mb-6 border border-white/10 inline-block px-4 py-1.5 rounded-full backdrop-blur-sm">
                The Ultimate Collection
              </h2>
           </motion.div>
           <motion.h1 
             className="text-7xl md:text-9xl font-extrabold text-white tracking-tighter leading-[0.85] mb-8"
-            initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, delay: 0.2 }}
+            initial={{ opacity: 0, scale: 0.9, y: 50 }} 
+            animate={{ opacity: 1, scale: 1, y: 0 }} 
+            transition={{ duration: 1, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
           >
             DESIGN <br /> RESOURCES
           </motion.h1>
           <motion.div
-            className="flex flex-col sm:flex-row items-center justify-center gap-6 pointer-events-auto" // Buttons need events
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 0.6 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-6 pointer-events-auto"
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
           >
              <MagneticButton className="px-8 py-4 bg-transparent border border-white/20 text-white font-bold rounded-full hover:bg-white/10 transition-colors">
                 <Users className="w-5 h-5" /> Join Community
@@ -312,7 +312,7 @@ const HeroSection: React.FC = () => {
         </div>
       </motion.div>
 
-      {/* The Tags - Wrapped in Parallax Motion Div */}
+      {/* Falling Tags */}
       <motion.div 
         style={{ y: tagsY }}
         className="absolute inset-0 z-10 pointer-events-none"
@@ -326,13 +326,15 @@ const HeroSection: React.FC = () => {
             }}
             onPointerDown={handlePointerDown}
             onClick={(e) => handleTagClick(tag.label, e)}
+            onMouseEnter={() => setCursor('text', 'DRAG')}
+            onMouseLeave={() => setCursor('default')}
             className="absolute top-0 left-0 touch-none select-none"
             style={{
               width: `${tag.width}px`,
               height: `${TAG_HEIGHT}px`,
               willChange: 'transform',
               transform: 'translate(-1000px, -1000px)',
-              pointerEvents: 'auto', // CRITICAL: Tags catch mouse/touch
+              pointerEvents: 'auto',
               cursor: 'grab'
             }}
           >

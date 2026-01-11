@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useMotionValueEvent, useScroll } from 'framer-motion';
 import { Search, ArrowUpRight, Zap, Twitter, Instagram, Github, Dribbble, ArrowRight } from 'lucide-react';
+import { useCursor } from './CursorContext';
 
 // --- Types & Data ---
 
@@ -84,6 +85,7 @@ const TiltCard: React.FC<TiltCardProps> = ({ resource, index }) => {
   const y = useMotionValue(0);
   const mouseX = useSpring(x, { stiffness: 150, damping: 15 });
   const mouseY = useSpring(y, { stiffness: 150, damping: 15 });
+  const { setCursor } = useCursor();
 
   const rotateX = useTransform(mouseY, [-0.5, 0.5], ["10deg", "-10deg"]);
   const rotateY = useTransform(mouseX, [-0.5, 0.5], ["-10deg", "10deg"]);
@@ -101,6 +103,11 @@ const TiltCard: React.FC<TiltCardProps> = ({ resource, index }) => {
   const handleMouseLeave = () => {
     x.set(0);
     y.set(0);
+    setCursor('default');
+  };
+
+  const handleMouseEnter = () => {
+    setCursor('text', 'VIEW');
   };
 
   const isFeatured = (index + 1) % 4 === 0;
@@ -116,9 +123,20 @@ const TiltCard: React.FC<TiltCardProps> = ({ resource, index }) => {
       style={{ perspective: 1000 }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onMouseEnter={handleMouseEnter}
     >
+      {/* Border Beam Effect Container - Slightly larger than content */}
+      <div className="absolute -inset-[1px] rounded-3xl overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0">
+          <div 
+             className="absolute inset-[-100%] animate-[spin_4s_linear_infinite]"
+             style={{
+               background: `conic-gradient(from 90deg at 50% 50%, #0000 0%, ${resource.color} 50%, #0000 100%)`
+             }}
+          />
+      </div>
+
       <motion.div
-        className="w-full h-full relative rounded-3xl bg-[#111111] border border-white/5 overflow-hidden"
+        className="w-full h-full relative rounded-3xl bg-[#111111] border border-white/5 overflow-hidden z-10"
         style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
       >
         <div 
@@ -183,6 +201,7 @@ const MainContent = () => {
   const [activeCategory, setActiveCategory] = useState<Category>('All');
   const [isScrolled, setIsScrolled] = useState(false);
   const { scrollY } = useScroll();
+  const { setCursor } = useCursor();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsScrolled(latest > 100);
@@ -205,6 +224,7 @@ const MainContent = () => {
                  key={cat}
                  onClick={() => setActiveCategory(cat)}
                  className={`relative px-4 py-2 rounded-full text-sm font-bold transition-colors whitespace-nowrap ${activeCategory === cat ? 'text-black' : 'text-slate-400 hover:text-white'}`}
+                 onMouseEnter={() => setCursor('default')}
                >
                  {activeCategory === cat && (
                    <motion.div 
