@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run db:setup:*)"
+      "Bash(npm run db:setup:*)",
+      "Bash(ls:*)",
+      "Bash(timeout 5 npm run dev:*)"
     ]
   }
 }
