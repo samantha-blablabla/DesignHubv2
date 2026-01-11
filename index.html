@@ -40,6 +40,7 @@
       /* Custom Neon Scrollbar */
       ::-webkit-scrollbar {
         width: 6px;
+        height: 6px; /* Ensures horizontal scrollbars also match the style if visible */
       }
       ::-webkit-scrollbar-track {
         background: #060606;
@@ -50,6 +51,15 @@
       }
       ::-webkit-scrollbar-thumb:hover {
         background: #facc15;
+      }
+
+      /* Utility to hide scrollbar */
+      .no-scrollbar::-webkit-scrollbar {
+        display: none !important;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
       }
     </style>
   <script type="importmap">

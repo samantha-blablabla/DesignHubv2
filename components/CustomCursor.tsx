@@ -42,6 +42,7 @@ const CustomCursor = () => {
   };
 
   return (
+    // Hidden on mobile (block on medium screens and up)
     <motion.div
       style={{
         left: smoothX,
@@ -54,7 +55,7 @@ const CustomCursor = () => {
       variants={variants}
       animate={cursorState.type}
       transition={{ type: "spring", stiffness: 500, damping: 28 }}
-      className="flex items-center justify-center overflow-hidden"
+      className="hidden md:flex items-center justify-center overflow-hidden"
     >
       {cursorState.label && (
         <motion.span

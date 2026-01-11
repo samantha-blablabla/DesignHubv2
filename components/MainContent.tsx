@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useMotionValueEvent, useScroll } from 'framer-motion';
 import { Search, ArrowUpRight } from 'lucide-react';
 import { useCursor } from './CursorContext';
-import VideoShowcase from './VideoShowcase';
+import SmartVideoGallery from './SmartVideoGallery';
 import BigFooter from './BigFooter';
 
 // --- Types & Data ---
@@ -52,6 +52,7 @@ const MagneticButton: React.FC<MagneticButtonProps> = ({ children, className = "
   const springY = useSpring(y, springConfig);
 
   const handleMouseMove = (e: React.MouseEvent) => {
+    if (window.innerWidth < 768) return; // Disable on mobile
     if (!ref.current) return;
     const { left, top, width, height } = ref.current.getBoundingClientRect();
     const centerX = left + width / 2;
@@ -93,6 +94,7 @@ const TiltCard: React.FC<TiltCardProps> = ({ resource, index }) => {
   const rotateY = useTransform(mouseX, [-0.5, 0.5], ["-10deg", "10deg"]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (window.innerWidth < 768) return; // Disable on mobile
     const rect = e.currentTarget.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;
@@ -109,7 +111,9 @@ const TiltCard: React.FC<TiltCardProps> = ({ resource, index }) => {
   };
 
   const handleMouseEnter = () => {
-    setCursor('text', 'VIEW');
+    if (window.innerWidth >= 768) {
+        setCursor('text', 'VIEW');
+    }
   };
 
   const isFeatured = (index + 1) % 4 === 0;
@@ -194,24 +198,29 @@ const MainContent = () => {
        <div className={`sticky top-0 z-40 w-full transition-all duration-300 ${isScrolled ? 'bg-[#060606]/80 backdrop-blur-md border-b border-white/5 py-3' : 'bg-transparent py-6'}`}>
          <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
            {/* Filters */}
-           <div className="flex gap-2 overflow-x-auto no-scrollbar w-full md:w-auto items-center">
-             {CATEGORIES.map(cat => (
-               <button 
-                 key={cat}
-                 onClick={() => setActiveCategory(cat)}
-                 className={`relative px-4 py-2 rounded-full text-sm font-bold transition-colors whitespace-nowrap ${activeCategory === cat ? 'text-black' : 'text-slate-400 hover:text-white'}`}
-                 onMouseEnter={() => setCursor('default')}
-               >
-                 {activeCategory === cat && (
-                   <motion.div 
-                     layoutId="activeFilter"
-                     className="absolute inset-0 bg-white rounded-full"
-                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                   />
-                 )}
-                 <span className="relative z-10">{cat}</span>
-               </button>
-             ))}
+           <div className="relative w-full md:w-auto min-w-0">
+             {/* Gradient Mask for Scroll Hint (Mobile) */}
+             <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#060606] via-[#060606]/80 to-transparent pointer-events-none z-20 md:hidden" />
+             
+             <div className="flex gap-2 overflow-x-auto no-scrollbar w-full md:w-auto items-center pr-12 md:pr-0">
+               {CATEGORIES.map(cat => (
+                 <button 
+                   key={cat}
+                   onClick={() => setActiveCategory(cat)}
+                   className={`relative px-4 py-2 rounded-full text-sm font-bold transition-colors whitespace-nowrap flex-shrink-0 ${activeCategory === cat ? 'text-black' : 'text-slate-400 hover:text-white'}`}
+                   onMouseEnter={() => setCursor('default')}
+                 >
+                   {activeCategory === cat && (
+                     <motion.div 
+                       layoutId="activeFilter"
+                       className="absolute inset-0 bg-white rounded-full"
+                       transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                     />
+                   )}
+                   <span className="relative z-10">{cat}</span>
+                 </button>
+               ))}
+             </div>
            </div>
            
            {/* Search */}
@@ -237,7 +246,7 @@ const MainContent = () => {
        </div>
        
        {/* Smart Video Showcase */}
-       <VideoShowcase />
+       <SmartVideoGallery />
 
        {/* Big Urban Footer */}
        <BigFooter />

@@ -24,11 +24,12 @@ const BigFooter = () => {
     const { setCursor } = useCursor();
 
   return (
-    <footer className="relative bg-[#060606] pt-20 pb-0 overflow-hidden border-t border-white/5">
-      <div className="max-w-7xl mx-auto px-6 relative z-10 pb-40">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
-          {/* Brand/Newsletter Column */}
-          <div className="md:col-span-5 space-y-8">
+    <footer className="relative bg-[#060606] pt-12 md:pt-20 pb-0 overflow-hidden border-t border-white/5">
+      <div className="max-w-7xl mx-auto px-6 relative z-10 pb-24 md:pb-40">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-12 text-center md:text-left">
+          
+          {/* Brand/Newsletter Column - Centered on mobile */}
+          <div className="md:col-span-5 space-y-6 md:space-y-8 flex flex-col items-center md:items-start">
              <div>
                 <h3 className="text-2xl font-bold text-white mb-2 tracking-tight">DesignHub Labs.</h3>
                 <p className="text-slate-500 text-sm leading-relaxed max-w-sm">
@@ -36,15 +37,15 @@ const BigFooter = () => {
                 </p>
              </div>
              
-             <form className="flex gap-2 max-w-md" onSubmit={(e) => e.preventDefault()}>
+             <form className="flex flex-col sm:flex-row gap-2 w-full max-w-md" onSubmit={(e) => e.preventDefault()}>
                 <input 
                     type="email" 
                     placeholder="ENTER EMAIL"
-                    className="flex-1 bg-white/5 border border-white/10 rounded-none px-4 py-3 text-sm text-white placeholder-slate-600 outline-none focus:border-yellow-500 transition-colors"
+                    className="flex-1 bg-white/5 border border-white/10 rounded-none px-4 py-3 text-sm text-white placeholder-slate-600 outline-none focus:border-yellow-500 transition-colors w-full"
                 />
                 <button 
                     type="submit"
-                    className="bg-yellow-500 text-black px-6 py-3 font-bold text-sm hover:bg-yellow-400 transition-colors flex items-center gap-2"
+                    className="bg-yellow-500 text-black px-6 py-3 font-bold text-sm hover:bg-yellow-400 transition-colors flex items-center justify-center gap-2 w-full sm:w-auto"
                     onMouseEnter={() => setCursor('text', 'JOIN')}
                     onMouseLeave={() => setCursor('default')}
                 >
@@ -53,13 +54,13 @@ const BigFooter = () => {
              </form>
           </div>
 
-          {/* Spacer */}
+          {/* Spacer - Hidden on mobile */}
           <div className="hidden md:block md:col-span-1" />
 
-          {/* Links Columns */}
-          <div className="md:col-span-2 space-y-6">
+          {/* Links Columns - Stacked on mobile */}
+          <div className="md:col-span-2 space-y-6 flex flex-col items-center md:items-start">
              <h4 className="text-white font-bold tracking-widest text-xs uppercase opacity-50">Sitemap</h4>
-             <div className="space-y-3">
+             <div className="space-y-3 flex flex-col items-center md:items-start">
                 <FooterLink href="#">Home</FooterLink>
                 <FooterLink href="#">Resources</FooterLink>
                 <FooterLink href="#">About</FooterLink>
@@ -67,9 +68,9 @@ const BigFooter = () => {
              </div>
           </div>
 
-          <div className="md:col-span-2 space-y-6">
+          <div className="md:col-span-2 space-y-6 flex flex-col items-center md:items-start">
              <h4 className="text-white font-bold tracking-widest text-xs uppercase opacity-50">Categories</h4>
-             <div className="space-y-3">
+             <div className="space-y-3 flex flex-col items-center md:items-start">
                 <FooterLink href="#">UI Kits</FooterLink>
                 <FooterLink href="#">Icons</FooterLink>
                 <FooterLink href="#">3D Models</FooterLink>
@@ -77,7 +78,7 @@ const BigFooter = () => {
              </div>
           </div>
 
-          <div className="md:col-span-2 space-y-6">
+          <div className="md:col-span-2 space-y-6 flex flex-col items-center md:items-start">
              <h4 className="text-white font-bold tracking-widest text-xs uppercase opacity-50">Social</h4>
              <div className="flex gap-4">
                 <a href="#" className="text-slate-400 hover:text-white transition-colors" onMouseEnter={() => setCursor('text', 'TW')} onMouseLeave={() => setCursor('default')}>
@@ -97,9 +98,9 @@ const BigFooter = () => {
       {/* Massive Text */}
       <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none select-none pointer-events-none z-0 opacity-10">
           <h1 
-            className="text-[15.5vw] font-black text-transparent w-full text-center whitespace-nowrap translate-y-[10%]"
+            className="text-[18vw] md:text-[15.5vw] font-black text-transparent w-full text-center whitespace-nowrap translate-y-[10%]"
             style={{ 
-                WebkitTextStroke: '1px rgba(255,255,255,0.2)',
+                WebkitTextStroke: '1px rgba(255,255,255,0.1)',
                 fontFamily: '"Bricolage Grotesque", sans-serif'
             }}
           >
