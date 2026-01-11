@@ -5,6 +5,7 @@ import NoiseOverlay from './components/NoiseOverlay';
 import HeroSection from './components/HeroSection';
 import ResourceGallery from './components/ResourceGallery';
 import VideoShowcase from './components/VideoShowcase';
+import BigFooter from './components/BigFooter';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <HeroSection />
           <ResourceGallery />
           <VideoShowcase />
+          <BigFooter />
         </div>
       </ScrollWrapper>
     </CursorProvider>

@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, PropsWithChildren } from 'react';
+import React, { createContext, useContext, useState, type PropsWithChildren } from 'react';
 
 type CursorType = 'default' | 'text';
 
