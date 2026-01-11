@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useMotionValueEvent, useScroll } from 'framer-motion';
-import { Search, ArrowUpRight } from 'lucide-react';
+import { Search, ArrowUpRight, Zap, Twitter, Instagram, Github, Dribbble, ArrowRight } from 'lucide-react';
 
 // --- Types & Data ---
 
@@ -103,7 +103,6 @@ const TiltCard: React.FC<TiltCardProps> = ({ resource, index }) => {
     y.set(0);
   };
 
-  // Every 4th item (indices 3, 7, 11) spans 2 columns on medium screens up
   const isFeatured = (index + 1) % 4 === 0;
 
   return (
@@ -122,24 +121,20 @@ const TiltCard: React.FC<TiltCardProps> = ({ resource, index }) => {
         className="w-full h-full relative rounded-3xl bg-[#111111] border border-white/5 overflow-hidden"
         style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
       >
-        {/* Glow Background */}
         <div 
           className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-500 blur-2xl z-0"
           style={{ background: resource.color }}
         />
         
-        {/* Image Section */}
         <div className="w-full h-[65%] overflow-hidden relative z-10">
           <img 
             src={resource.image} 
             alt={resource.title} 
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
-          {/* Vignette Overlay */}
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#111111]" />
         </div>
 
-        {/* Content Section */}
         <div className="absolute inset-0 z-20 flex flex-col justify-end p-6 pointer-events-none">
           <div className="pointer-events-auto transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
              <span style={{ color: resource.color }} className="text-[10px] font-bold uppercase tracking-widest mb-2 block">{resource.category}</span>
@@ -148,7 +143,6 @@ const TiltCard: React.FC<TiltCardProps> = ({ resource, index }) => {
           </div>
         </div>
 
-        {/* Floating Magnetic Button */}
         <div className="absolute top-4 right-4 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
            <MagneticButton className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center shadow-lg hover:bg-slate-200 transition-colors cursor-pointer">
               <ArrowUpRight className="w-5 h-5" />
@@ -156,6 +150,32 @@ const TiltCard: React.FC<TiltCardProps> = ({ resource, index }) => {
         </div>
       </motion.div>
     </motion.div>
+  );
+};
+
+const SocialLink = ({ Icon, href, color }: { Icon: React.ElementType, href: string, color: string }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  return (
+    <a 
+      href={href}
+      className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center transition-all duration-300 border border-white/5 group"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{
+        borderColor: isHovered ? color : 'rgba(255,255,255,0.05)',
+        backgroundColor: isHovered ? `${color}15` : 'rgba(255,255,255,0.05)',
+        boxShadow: isHovered ? `0 0 15px ${color}30` : 'none'
+      }}
+    >
+      <Icon 
+        className="w-5 h-5 transition-all duration-300"
+        style={{
+          color: isHovered ? color : '#94a3b8',
+          filter: isHovered ? `drop-shadow(0 0 8px ${color})` : 'none'
+        }}
+      />
+    </a>
   );
 };
 
@@ -173,7 +193,7 @@ const MainContent = () => {
     : RESOURCES.filter(r => r.category === activeCategory);
 
   return (
-    <div className="relative w-full min-h-screen bg-[#060606] text-white selection:bg-yellow-500 selection:text-black pb-32">
+    <div className="relative w-full min-h-screen bg-[#060606] text-white selection:bg-yellow-500 selection:text-black pb-0">
        
        {/* Sticky Filter Navigation */}
        <div className={`sticky top-0 z-40 w-full transition-all duration-300 ${isScrolled ? 'bg-[#060606]/80 backdrop-blur-md border-b border-white/5 py-3' : 'bg-transparent py-6'}`}>
@@ -210,7 +230,7 @@ const MainContent = () => {
        </div>
 
        {/* Gallery Grid */}
-       <div className="max-w-7xl mx-auto px-6 mt-8">
+       <div className="max-w-7xl mx-auto px-6 mt-8 mb-32">
          <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
            <AnimatePresence mode='popLayout'>
              {filteredResources.map((resource, i) => (
@@ -220,10 +240,74 @@ const MainContent = () => {
          </motion.div>
        </div>
        
-       {/* Simple Footer */}
-       <div className="border-t border-white/10 mt-32 pt-12 text-center text-slate-500 text-sm">
-         <p>© 2024 DESIGN HUB. TOKYO.</p>
-       </div>
+       {/* Expanded Footer */}
+       <footer className="border-t border-white/10 bg-[#080808] relative z-10">
+         <div className="max-w-7xl mx-auto px-6 py-20">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-16 md:gap-8">
+              {/* Brand Section */}
+              <div className="md:col-span-4 space-y-6">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+                        <Zap className="w-6 h-6 text-black fill-current" />
+                    </div>
+                    <span className="text-2xl font-bold tracking-tight text-white">DesignHub</span>
+                </div>
+                <p className="text-slate-500 text-sm leading-relaxed max-w-sm">
+                  The definitive archive for digital creators. Curating the finest UI kits, icons, and assets for the modern web. Built for speed, aesthetics, and utility.
+                </p>
+                <div className="flex gap-4 pt-2">
+                    <SocialLink Icon={Twitter} href="#" color="#38bdf8" />
+                    <SocialLink Icon={Instagram} href="#" color="#e1306c" />
+                    <SocialLink Icon={Dribbble} href="#" color="#ea4c89" />
+                    <SocialLink Icon={Github} href="#" color="#ffffff" />
+                </div>
+              </div>
+
+              {/* Navigation Links */}
+              <div className="md:col-span-3 space-y-6">
+                 <h4 className="text-white font-bold text-lg tracking-wide">Explore</h4>
+                 <div className="flex flex-col gap-4 text-sm text-slate-400">
+                    <a href="#" className="hover:text-white hover:translate-x-1 transition-all duration-300 flex items-center gap-2">
+                      <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100" /> All Resources
+                    </a>
+                    <a href="#" className="hover:text-white hover:translate-x-1 transition-all duration-300">Trending</a>
+                    <a href="#" className="hover:text-white hover:translate-x-1 transition-all duration-300">Submit Resource</a>
+                    <a href="#" className="hover:text-white hover:translate-x-1 transition-all duration-300">About Us</a>
+                 </div>
+              </div>
+
+              {/* Newsletter */}
+              <div className="md:col-span-5 space-y-6">
+                <div>
+                   <h4 className="text-white font-bold text-lg tracking-wide mb-2">Join the Collective</h4>
+                   <p className="text-slate-500 text-sm">Weekly drops of free resources, straight to your inbox. No spam, just fire assets.</p>
+                </div>
+                <form className="relative group max-w-md" onSubmit={(e) => e.preventDefault()}>
+                    <input 
+                        type="email" 
+                        placeholder="email@address.com" 
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 pr-14 text-sm text-white placeholder-slate-600 outline-none focus:border-yellow-500 focus:bg-white/10 transition-all duration-300"
+                    />
+                    <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-yellow-500 rounded-lg text-black hover:bg-yellow-400 hover:scale-105 transition-all duration-300 shadow-[0_0_10px_rgba(234,179,8,0.3)]">
+                        <ArrowRight className="w-5 h-5" />
+                    </button>
+                </form>
+                <div className="flex gap-6 text-xs text-slate-600">
+                    <a href="#" className="hover:text-slate-400 transition-colors">Privacy Policy</a>
+                    <a href="#" className="hover:text-slate-400 transition-colors">Terms of Service</a>
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t border-white/5 mt-20 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p className="text-slate-600 text-xs tracking-wider">© 2024 DESIGN HUB. TOKYO.</p>
+                <div className="flex items-center gap-2">
+                   <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] animate-pulse" />
+                   <p className="text-slate-600 text-xs font-mono uppercase">Systems Operational</p>
+                </div>
+            </div>
+         </div>
+       </footer>
     </div>
   );
 };
