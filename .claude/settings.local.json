@@ -5,7 +5,10 @@
       "Bash(ls:*)",
       "Bash(timeout 5 npm run dev:*)",
       "Bash(npm pkg:*)",
-      "Bash(npm run db:update-videos:*)"
+      "Bash(npm run db:update-videos:*)",
+      "Bash(npm run build:*)",
+      "Bash(wrangler pages deployment create:*)",
+      "Bash(git add:*)"
     ]
   }
 }
