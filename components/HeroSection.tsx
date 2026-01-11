@@ -32,7 +32,14 @@ const TAG_HEIGHT = 48;
 const CHAMFER_RADIUS = 24;
 
 // --- Magnetic Button Component ---
-const MagneticButton = ({ children, className = "", onClick }: { children: React.ReactNode, className?: string, onClick?: () => void }) => {
+
+interface MagneticButtonProps {
+  children: React.ReactNode;
+  className?: string;
+  onClick?: () => void;
+}
+
+const MagneticButton: React.FC<MagneticButtonProps> = ({ children, className = "", onClick }) => {
   const ref = useRef<HTMLButtonElement>(null);
   
   const x = useMotionValue(0);
