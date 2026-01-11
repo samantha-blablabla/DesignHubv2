@@ -3,7 +3,9 @@
     "allow": [
       "Bash(npm run db:setup:*)",
       "Bash(ls:*)",
-      "Bash(timeout 5 npm run dev:*)"
+      "Bash(timeout 5 npm run dev:*)",
+      "Bash(npm pkg:*)",
+      "Bash(npm run db:update-videos:*)"
     ]
   }
 }

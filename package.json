@@ -7,23 +7,24 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "db:setup": "tsx scripts/setup-database.ts"
+    "db:setup": "tsx scripts/setup-database.ts",
+    "db:update-videos": "tsx scripts/update-video-sources.ts"
   },
   "dependencies": {
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3",
-    "lucide-react": "^0.562.0",
+    "@supabase/supabase-js": "^2.39.3",
     "framer-motion": "^12.25.0",
-    "matter-js": "^0.20.0",
     "lenis": "^1.1.0",
-    "@supabase/supabase-js": "^2.39.3"
+    "lucide-react": "^0.562.0",
+    "matter-js": "^0.20.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
     "@vitejs/plugin-react": "^5.0.0",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.0",
+    "dotenv": "^16.4.1",
     "tsx": "^4.7.0",
-    "dotenv": "^16.4.1"
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
   }
 }
