@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Urban Dark Theme */
+:root {
+  --urban-bg: #060606;
+  --urban-neon-yellow: #eab308;
+  --urban-neon-blue: #3b82f6;
+  --urban-neon-orange: #f97316;
+  --urban-neon-purple: #a855f7;
+  --urban-neon-green: #22c55e;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #060606;
+  color: white;
+  font-family: 'Bricolage Grotesque', 'Plus Jakarta Sans', system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Hide default cursor */
+body, body * {
+  cursor: none;
+}
+
+/* Selection */
+::selection {
+  background-color: var(--urban-neon-yellow);
+  color: black;
+}
