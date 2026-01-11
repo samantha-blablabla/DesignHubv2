@@ -1,47 +1,61 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, useSpring, useTransform } from 'framer-motion';
 import { useCursor } from './CursorContext';
+import { Play, Pause, Volume2, VolumeX, Maximize2, ArrowUpRight } from 'lucide-react';
 
 const VIDEOS = [
   {
     id: 1,
     title: 'Kinetic Typography',
+    duration: '00:12',
     thumb: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop',
     video: 'https://assets.mixkit.co/videos/preview/mixkit-ink-swirling-in-water-196-large.mp4',
+    link: '#project-kinetic', // Placeholder link
   },
   {
     id: 2,
     title: 'Fluid Simulations',
+    duration: '00:08',
     thumb: 'https://images.unsplash.com/photo-1604533038676-e82df491c10d?q=80&w=1000&auto=format&fit=crop',
     video: 'https://assets.mixkit.co/videos/preview/mixkit-holographic-fluid-surface-loop-2747-large.mp4',
+    link: '#project-fluid',
   },
   {
     id: 3,
     title: 'Abstract Data',
+    duration: '00:15',
     thumb: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop',
     video: 'https://assets.mixkit.co/videos/preview/mixkit-abstract-technology-network-lines-2766-large.mp4',
+    link: '#project-data',
   },
   {
     id: 4,
     title: 'Cyber Particles',
+    duration: '00:10',
     thumb: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop',
     video: 'https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-blue-particles-4618-large.mp4',
+    link: '#project-particles',
   },
 ];
 
 interface VideoItemProps {
   item: typeof VIDEOS[0];
+  isHovered: boolean;
+  isAnyHovered: boolean;
+  onHoverStart: () => void;
+  onHoverEnd: () => void;
 }
 
-const VideoItem: React.FC<VideoItemProps> = ({ item }) => {
+const VideoItem: React.FC<VideoItemProps> = ({ item, isHovered, isAnyHovered, onHoverStart, onHoverEnd }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { setCursor } = useCursor();
   const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Auto-play on mobile when 50% visible
-  const isInView = useInView(containerRef, { amount: 0.5 });
+  // Performance: Only check visibility logic if needed
+  const isInView = useInView(containerRef, { amount: 0.6, margin: "0px 0px -100px 0px" });
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.matchMedia('(max-width: 768px)').matches);
@@ -50,96 +64,157 @@ const VideoItem: React.FC<VideoItemProps> = ({ item }) => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Desktop Hover Logic (UI Interaction)
-  const handleMouseEnter = () => {
-    if (isMobile) return;
-    setCursor('text', 'PLAY');
-    setIsPlaying(true);
-  };
-
-  const handleMouseLeave = () => {
-    if (isMobile) return;
-    setCursor('default');
-    setIsPlaying(false);
-  };
-
-  // Mobile In-View Logic (UI Interaction)
+  // Logic: Decide if video should play
   useEffect(() => {
+    let shouldPlay = false;
+
     if (isMobile) {
-      if (isInView) {
-        setIsPlaying(true);
-      } else {
-        setIsPlaying(false);
-      }
+      // Mobile: Play if in center of view
+      shouldPlay = isInView;
+    } else {
+      // Desktop: Play only on Hover
+      shouldPlay = isHovered;
     }
-  }, [isInView, isMobile]);
 
-  // Sync Video Playback State
-  useEffect(() => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        const playPromise = videoRef.current.play();
+    setIsPlaying(shouldPlay);
+
+    const video = videoRef.current;
+    if (video) {
+      if (shouldPlay) {
+        const playPromise = video.play();
         if (playPromise !== undefined) {
-          playPromise.catch(() => {
-             // Autoplay was prevented by browser policy or interaction needed
-          });
+          playPromise.catch(() => { /* Auto-play prevented */ });
         }
       } else {
-        videoRef.current.pause();
-        if (!isMobile) videoRef.current.currentTime = 0; // Reset on desktop hover exit
+        video.pause();
+        if (!isMobile) video.currentTime = 0; // Reset on desktop for replay feel
       }
     }
-  }, [isPlaying, isMobile]);
+  }, [isHovered, isInView, isMobile]);
+
+  // Update Progress Bar
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      const p = (videoRef.current.currentTime / videoRef.current.duration) * 100;
+      setProgress(p);
+    }
+  };
+
+  // Cinema Mode Styles
+  // If something else is hovered, and I am NOT hovered -> Dim me
+  const isDimmed = isAnyHovered && !isHovered && !isMobile;
 
   return (
-    <motion.div
+    <motion.a
+      href={item.link}
       ref={containerRef}
-      className="relative aspect-video rounded-2xl overflow-hidden cursor-none group bg-[#111] border border-white/5"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      whileHover={!isMobile ? { scale: 1.02 } : {}}
-      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      className={`relative block aspect-video rounded-2xl overflow-hidden bg-[#111] border border-white/5 transition-all duration-500 group ${isDimmed ? 'opacity-30 scale-95 blur-[2px] grayscale' : 'opacity-100 scale-100 grayscale-0'}`}
+      onMouseEnter={() => {
+        if (!isMobile) {
+            onHoverStart();
+            setCursor('text', 'VIEW'); // Updated to explicit action
+        }
+      }}
+      onMouseLeave={() => {
+        if (!isMobile) {
+            onHoverEnd();
+            setCursor('default');
+        }
+      }}
     >
-      {/* Thumbnail Layer */}
+      {/* Thumbnail */}
       <div 
         className={`absolute inset-0 bg-cover bg-center transition-opacity duration-500 ${isPlaying ? 'opacity-0' : 'opacity-100'}`}
         style={{ backgroundImage: `url(${item.thumb})` }}
       />
+      
+      {/* Dark Overlay for Text Readability (When not playing) */}
       <div className={`absolute inset-0 bg-black/40 transition-opacity duration-500 ${isPlaying ? 'opacity-0' : 'opacity-100'}`} />
 
-      {/* Video Layer */}
+      {/* Video Element */}
       <video
         ref={videoRef}
         src={item.video}
         loop
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
+        preload="metadata" // Performance: Don't load full video until needed
+        onTimeUpdate={handleTimeUpdate}
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none" // Ensure clicks pass to the anchor
         style={{ opacity: isPlaying ? 1 : 0 }}
       />
 
-      {/* Content Overlay (UI) */}
-      <div className="absolute inset-0 p-6 flex flex-col justify-end pointer-events-none">
-        <h3 className={`text-white font-bold text-xl tracking-tight transition-all duration-500 ${isMobile ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 group-hover:translate-y-0 group-hover:opacity-100'}`}>
-            {item.title}
-        </h3>
+      {/* Floating UI Overlay - Visible on Hover/Play */}
+      <div className="absolute inset-0 p-6 flex flex-col justify-between pointer-events-none">
+        
+        {/* Top Right Status */}
+        <div className={`flex justify-end items-start transition-opacity duration-300 ${isPlaying ? 'opacity-100' : 'opacity-0'}`}>
+            <div className="bg-black/50 backdrop-blur-md px-2 py-1 rounded text-[10px] font-mono text-white flex items-center gap-2 border border-white/10">
+                <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                REC
+            </div>
+        </div>
+        
+        {/* Hover Arrow (Top Right) - Only shows when hovered/playing */}
+        <div className={`absolute top-6 right-6 transition-all duration-300 transform ${isPlaying ? 'opacity-100 translate-x-0 translate-y-0' : 'opacity-0 -translate-x-2 translate-y-2'}`}>
+            <div className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center">
+                <ArrowUpRight className="w-5 h-5" />
+            </div>
+        </div>
+
+        {/* Bottom Info */}
+        <div className={`transform transition-all duration-500 ${isPlaying ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-100'}`}>
+            <div className="flex justify-between items-end mb-3">
+                <div>
+                    <h3 className="text-white font-bold text-lg md:text-xl tracking-tight leading-none mb-1">{item.title}</h3>
+                    <p className="text-slate-400 text-xs font-mono">{item.duration} • 4K 60FPS</p>
+                </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+                <motion.div 
+                    className="h-full bg-yellow-500"
+                    style={{ width: `${progress}%` }}
+                    transition={{ ease: "linear", duration: 0.1 }}
+                />
+            </div>
+        </div>
       </div>
-    </motion.div>
+    </motion.a>
   );
 };
 
 const SmartVideoGallery = () => {
+  const [hoveredId, setHoveredId] = useState<number | null>(null);
+
   return (
-    <section className="w-full py-12 md:py-24 px-6 bg-[#060606]">
+    <section className="w-full py-12 md:py-24 px-6 bg-[#060606] overflow-hidden">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center gap-4 mb-8 md:mb-12">
-            <div className="h-px flex-1 bg-white/10"></div>
-            <h2 className="text-xl md:text-2xl font-bold text-white uppercase tracking-widest">Motion Gallery</h2>
-            <div className="h-px flex-1 bg-white/10"></div>
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+            <div className="flex items-center gap-4 flex-1">
+                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                <h2 className="text-2xl md:text-3xl font-bold text-white uppercase tracking-tighter">
+                    Motion <span className="text-slate-600">Archive</span>
+                </h2>
+            </div>
+            <p className="text-slate-500 text-sm md:max-w-md leading-relaxed">
+                Hover to preview high-fidelity motion assets. Click to view project details.
+            </p>
         </div>
+
+        {/* Gallery Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           {VIDEOS.map((video) => (
-            <VideoItem key={video.id} item={video} />
+            <VideoItem 
+                key={video.id} 
+                item={video} 
+                isHovered={hoveredId === video.id}
+                isAnyHovered={hoveredId !== null}
+                onHoverStart={() => setHoveredId(video.id)}
+                onHoverEnd={() => setHoveredId(null)}
+            />
           ))}
         </div>
       </div>
