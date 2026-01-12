@@ -200,11 +200,11 @@ const HeroSection: React.FC = () => {
     Matter.Render.run(render);
     runnerRef.current = runner;
 
-    // Staggered Gravity Enable
+    // Staggered Gravity Enable - reduced delay for immediate effect
     setTimeout(() => {
         engine.gravity.y = 1;
         gravityInitialized.current = true; // Mark gravity as initialized
-    }, 1200);
+    }, 100); // Reduced from 1200ms to 100ms for instant drop
 
     // Use unified scheduler for DOM sync (Runner handles physics update)
     const unsubscribe = globalScheduler.subscribe('hero-physics', (time, delta) => {
@@ -217,6 +217,10 @@ const HeroSection: React.FC = () => {
       tagBodies.forEach((body) => {
         const domNode = tagsRef.current.get(body.label);
         if (domNode) {
+          // Debug: Log first tag position to see if physics is working
+          if (body.label === 'ui-kits' && body.position.y > -100) {
+            console.log('Tag position:', body.position.y.toFixed(2), 'Gravity:', engineRef.current?.gravity.y);
+          }
           const { x, y } = body.position;
           const rotation = body.angle;
           const tag = displayedTags.find(t => t.id === body.label);
