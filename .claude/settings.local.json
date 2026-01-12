@@ -15,7 +15,8 @@
       "Bash(npm run dev:*)",
       "Bash(git commit:*)",
       "Bash(lsof:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(git push:*)"
     ]
   }
 }
