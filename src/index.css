@@ -1,34 +1,55 @@
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
-
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap');
 
-/* Urban Dark Theme */
-:root {
-  --urban-bg: #060606;
-  --urban-neon-yellow: #eab308;
-  --urban-neon-blue: #3b82f6;
-  --urban-neon-orange: #f97316;
-  --urban-neon-purple: #a855f7;
-  --urban-neon-green: #22c55e;
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
 }
 
 body {
-  margin: 0;
-  padding: 0;
+  font-family: 'Bricolage Grotesque', sans-serif;
   background-color: #060606;
-  color: white;
-  font-family: 'Bricolage Grotesque', 'Plus Jakarta Sans', system-ui, sans-serif;
+  margin: 0;
   overflow-x: hidden;
+  cursor: default;
 }
 
-/* Hide default cursor */
-body, body * {
-  cursor: none;
+/* Custom Neon Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #060606;
+}
+::-webkit-scrollbar-thumb {
+  background: #eab308; /* Yellow-500 */
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #facc15;
 }
 
-/* Selection */
-::selection {
-  background-color: var(--urban-neon-yellow);
-  color: black;
+/* Utility to hide scrollbar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
