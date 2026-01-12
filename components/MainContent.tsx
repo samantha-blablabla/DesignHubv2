@@ -62,9 +62,10 @@ const RESOURCES: Resource[] = [
 interface MagneticButtonProps {
   children: React.ReactNode;
   className?: string;
+  onClick?: () => void;
 }
 
-const MagneticButton: React.FC<MagneticButtonProps> = ({ children, className = "" }) => {
+const MagneticButton: React.FC<MagneticButtonProps> = ({ children, className = "", onClick }) => {
   const ref = useRef<HTMLButtonElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -93,6 +94,7 @@ const MagneticButton: React.FC<MagneticButtonProps> = ({ children, className = "
       className={className}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onClick={onClick}
       style={{ x: springX, y: springY }}
     >
       {children}

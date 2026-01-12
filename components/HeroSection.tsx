@@ -124,7 +124,8 @@ const HeroSection: React.FC = () => {
   // The scheduler will continue to call our update function
   // We can disable gravity to "pause" physics simulation instead
   useEffect(() => {
-    if (!engineRef.current || !gravityInitialized.current) return;
+    if (!engineRef.current) return;
+    if (!gravityInitialized.current) return; // Don't gate before initial animation
 
     if (isHeroVisible) {
       // Resume physics by enabling gravity
