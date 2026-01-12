@@ -16,7 +16,9 @@
       "Bash(git commit:*)",
       "Bash(lsof:*)",
       "Bash(git log:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(wrangler --version:*)",
+      "Bash(npm install:*)"
     ]
   }
 }
