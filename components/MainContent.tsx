@@ -33,6 +33,10 @@ const RESOURCES: Resource[] = [
   { id: '10', title: 'Brutalist Type', category: 'Fonts', image: 'https://images.unsplash.com/photo-1592496431122-2349e0fbc666?auto=format&fit=crop&q=80&w=800', description: 'Bold, heavy, impact fonts.', color: '#22c55e' },
   { id: '11', title: 'Gradient Maps', category: 'Utilities', image: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&q=80&w=800', description: 'Photoshop gradient presets.', color: '#f97316' },
   { id: '12', title: 'Dashboard UI', category: 'UI Kits', image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800', description: 'Admin panel templates.', color: '#3b82f6' },
+  { id: '13', title: 'Neon Glow Palette', category: 'Colors', image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=800', description: 'Vibrant neon color schemes.', color: '#ec4899' },
+  { id: '14', title: '3D Abstract Shapes', category: 'Illustrations', image: 'https://images.unsplash.com/photo-1618556450994-a6a128ef0d9d?auto=format&fit=crop&q=80&w=800', description: 'High-quality 3D renders.', color: '#14b8a6' },
+  { id: '15', title: 'Grid Layout System', category: 'Utilities', image: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=800', description: 'Responsive grid templates.', color: '#8b5cf6' },
+  { id: '16', title: 'Tech Icons Pack', category: 'Icons', image: 'https://images.unsplash.com/photo-1607799279861-4dd421887fb3?auto=compress&cs=tinysrgb&w=800', description: 'Modern tech icon set.', color: '#06b6d4' },
 ];
 
 // --- Components ---

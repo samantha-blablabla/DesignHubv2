@@ -158,6 +158,78 @@ const SmartVideoGallery = () => {
 
   // === CLAUDE CODE: Fetch motion assets from Supabase ===
   useEffect(() => {
+    // DEMO: Using dummy data instead of Supabase for testing
+    // Replace with Supabase fetch when database is ready
+    const DUMMY_VIDEOS: MotionAsset[] = [
+      {
+        id: 1,
+        title: 'Abstract Ink Flow',
+        duration: '00:14',
+        thumb: 'https://images.pexels.com/photos/3137078/pexels-photo-3137078.jpeg?auto=compress&cs=tinysrgb&w=800',
+        video: 'https://videos.pexels.com/video-files/3255275/3255275-hd_1920_1080_30fps.mp4',
+        link: '#project-ink',
+        description: 'Mesmerizing ink swirls in water with vibrant colors',
+        tags: ['abstract', 'fluid', 'art']
+      },
+      {
+        id: 2,
+        title: 'Digital Particles',
+        duration: '00:20',
+        thumb: 'https://images.pexels.com/photos/2539462/pexels-photo-2539462.jpeg?auto=compress&cs=tinysrgb&w=800',
+        video: 'https://videos.pexels.com/video-files/3141207/3141207-hd_1920_1080_25fps.mp4',
+        link: '#project-particles',
+        description: 'Glowing digital particles flowing in space',
+        tags: ['particles', 'digital', 'motion']
+      },
+      {
+        id: 3,
+        title: 'Neon Waves',
+        duration: '00:15',
+        thumb: 'https://images.pexels.com/photos/1939485/pexels-photo-1939485.jpeg?auto=compress&cs=tinysrgb&w=800',
+        video: 'https://videos.pexels.com/video-files/3130284/3130284-hd_1920_1080_30fps.mp4',
+        link: '#project-neon',
+        description: 'Colorful neon light waves in motion',
+        tags: ['neon', 'waves', 'glow']
+      },
+      {
+        id: 4,
+        title: 'Smoke Motion',
+        duration: '00:12',
+        thumb: 'https://images.pexels.com/photos/1591447/pexels-photo-1591447.jpeg?auto=compress&cs=tinysrgb&w=800',
+        video: 'https://videos.pexels.com/video-files/2635812/2635812-hd_1920_1080_24fps.mp4',
+        link: '#project-smoke',
+        description: 'Ethereal smoke flowing gracefully',
+        tags: ['smoke', 'ethereal', 'flow']
+      },
+      {
+        id: 5,
+        title: 'Liquid Gold',
+        duration: '00:18',
+        thumb: 'https://images.pexels.com/photos/4667220/pexels-photo-4667220.jpeg?auto=compress&cs=tinysrgb&w=800',
+        video: 'https://videos.pexels.com/video-files/3196465/3196465-hd_1920_1080_24fps.mp4',
+        link: '#project-gold',
+        description: 'Golden liquid paint flowing and mixing',
+        tags: ['liquid', 'gold', 'paint']
+      },
+      {
+        id: 6,
+        title: 'Abstract Geometry',
+        duration: '00:16',
+        thumb: 'https://images.pexels.com/photos/3532544/pexels-photo-3532544.jpeg?auto=compress&cs=tinysrgb&w=800',
+        video: 'https://videos.pexels.com/video-files/3129957/3129957-hd_1920_1080_30fps.mp4',
+        link: '#project-geometry',
+        description: 'Geometric shapes morphing in 3D space',
+        tags: ['geometry', '3d', 'abstract']
+      }
+    ];
+
+    // Simulate loading delay
+    setTimeout(() => {
+      setVideos(DUMMY_VIDEOS);
+      setLoading(false);
+    }, 500);
+
+    /* ORIGINAL SUPABASE CODE - Uncomment when database is ready:
     async function fetchMotionAssets() {
       try {
         setLoading(true);
@@ -176,6 +248,7 @@ const SmartVideoGallery = () => {
     }
 
     fetchMotionAssets();
+    */
   }, []);
 
   return (
