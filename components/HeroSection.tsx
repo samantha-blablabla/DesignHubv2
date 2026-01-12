@@ -19,15 +19,15 @@ const TAGS: TagData[] = [
   { id: 'ui-kits', label: 'UI Kits', bgClass: 'bg-yellow-500', textClass: 'text-black', width: 100 },
   { id: 'figma', label: 'Figma', bgClass: 'bg-blue-500', textClass: 'text-white', width: 90 },
   { id: 'icons', label: 'Icons', bgClass: 'bg-orange-500', textClass: 'text-white', width: 90 },
-  { id: '3d', label: '3D Models', bgClass: 'bg-purple-500', textClass: 'text-white', width: 135 },
+  { id: '3d', label: '3D Models', bgClass: 'bg-purple-500', textClass: 'text-white', width: 130 },
   { id: 'fonts', label: 'Fonts', bgClass: 'bg-green-500', textClass: 'text-black', width: 90 },
-  { id: 'mockups', label: 'Mockups', bgClass: 'bg-yellow-500', textClass: 'text-black', width: 115 },
-  { id: 'illustrations', label: 'Illustrations', bgClass: 'bg-blue-500', textClass: 'text-white', width: 145 },
-  { id: 'colors', label: 'Palettes', bgClass: 'bg-orange-500', textClass: 'text-white', width: 115 },
-  { id: 'textures', label: 'Textures', bgClass: 'bg-purple-500', textClass: 'text-white', width: 115 },
-  { id: 'templates', label: 'Templates', bgClass: 'bg-green-500', textClass: 'text-black', width: 130 },
-  { id: 'wireframes', label: 'Wireframes', bgClass: 'bg-yellow-500', textClass: 'text-black', width: 140 },
-  { id: 'brushes', label: 'Brushes', bgClass: 'bg-blue-500', textClass: 'text-white', width: 105 },
+  { id: 'mockups', label: 'Mockups', bgClass: 'bg-yellow-500', textClass: 'text-black', width: 110 },
+  { id: 'illustrations', label: 'Illustrations', bgClass: 'bg-blue-500', textClass: 'text-white', width: 140 },
+  { id: 'colors', label: 'Palettes', bgClass: 'bg-orange-500', textClass: 'text-white', width: 110 },
+  { id: 'textures', label: 'Textures', bgClass: 'bg-purple-500', textClass: 'text-white', width: 110 },
+  { id: 'templates', label: 'Templates', bgClass: 'bg-green-500', textClass: 'text-black', width: 125 },
+  { id: 'wireframes', label: 'Wireframes', bgClass: 'bg-yellow-500', textClass: 'text-black', width: 135 },
+  { id: 'brushes', label: 'Brushes', bgClass: 'bg-blue-500', textClass: 'text-white', width: 100 },
 ];
 
 const TAG_HEIGHT = 48;
@@ -97,7 +97,6 @@ const HeroSection: React.FC = () => {
   const clickStartRef = useRef<{x: number, y: number} | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [displayedTags, setDisplayedTags] = useState<TagData[]>([]);
-  const gravityInitialized = useRef(false);
   const { setCursor } = useCursor();
 
   // --- Intersection Observer for performance gating ---
@@ -118,13 +117,12 @@ const HeroSection: React.FC = () => {
   // Gate physics engine based on visibility for performance
   useEffect(() => {
     if (!runnerRef.current || !engineRef.current) return;
-    if (!gravityInitialized.current) return; // Don't gate before initial animation
 
     if (isHeroVisible) {
-      // Resume physics when visible
+      // Resume physics when hero comes into view
       Matter.Runner.run(runnerRef.current, engineRef.current);
     } else {
-      // Pause physics when off-screen (huge performance save)
+      // Pause physics when hero scrolled out of view (huge performance save!)
       Matter.Runner.stop(runnerRef.current);
     }
   }, [isHeroVisible]);
@@ -154,23 +152,22 @@ const HeroSection: React.FC = () => {
     render.canvas.style.pointerEvents = 'none';
     render.canvas.style.opacity = '0';
 
-    // 3. Boundaries (with reset zones)
+    // 3. Boundaries
     const ground = Matter.Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 50, window.innerWidth, 100, { isStatic: true });
     const wallLeft = Matter.Bodies.rectangle(-50, window.innerHeight / 2, 100, window.innerHeight, { isStatic: true });
     const wallRight = Matter.Bodies.rectangle(window.innerWidth + 50, window.innerHeight / 2, 100, window.innerHeight, { isStatic: true });
-    const ceiling = Matter.Bodies.rectangle(window.innerWidth / 2, -50, window.innerWidth, 100, { isStatic: true });
-    Matter.Composite.add(world, [ground, wallLeft, wallRight, ceiling]);
+    Matter.Composite.add(world, [ground, wallLeft, wallRight]);
 
-    // 4. Bodies (Positioned close to viewport for instant visibility)
+    // 4. Bodies (Positioned high initially)
     const tagBodies = displayedTags.map((tag) => {
       const x = Math.random() * (window.innerWidth - 200) + 100;
-      const y = -Math.random() * 100 - 50; // Much closer to screen
+      const y = -Math.random() * 500 - 200; // Start higher
       return Matter.Bodies.rectangle(x, y, tag.width, TAG_HEIGHT, {
         chamfer: { radius: CHAMFER_RADIUS },
         restitution: 0.8,
         friction: 0.005,
         density: 0.04,
-        label: tag.id, 
+        label: tag.id,
       });
     });
     Matter.Composite.add(world, tagBodies);
@@ -194,25 +191,21 @@ const HeroSection: React.FC = () => {
 
     // 6. Run & Sync
     const runner = Matter.Runner.create();
-    // NOTE: We use BOTH Runner and scheduler temporarily for debugging
-    // The Runner provides automatic updates, scheduler syncs DOM
     Matter.Runner.run(runner, engine);
     Matter.Render.run(render);
     runnerRef.current = runner;
 
-    // Enable gravity immediately for instant drop
+    // Staggered Gravity Enable
     setTimeout(() => {
-        engine.gravity.y = 2; // Increased from 1 to 2 for faster falling
-        gravityInitialized.current = true;
-        console.log('[HeroSection] Gravity enabled:', engine.gravity.y);
-    }, 50); // Almost instant
+        engine.gravity.y = 1;
+    }, 1200);
 
-    // Use unified scheduler for DOM sync (Runner handles physics update)
+    // Use unified scheduler instead of separate RAF loop
     const unsubscribe = globalScheduler.subscribe('hero-physics', (time, delta) => {
       if (!engineRef.current) return;
 
-      // NOTE: Matter.Runner is already updating the engine
-      // We just sync DOM positions here
+      // Update physics with accurate delta time (Matter.js expects milliseconds)
+      Matter.Engine.update(engine, delta);
 
       // Sync DOM with physics state - batched in single frame
       tagBodies.forEach((body) => {
@@ -222,15 +215,6 @@ const HeroSection: React.FC = () => {
           const rotation = body.angle;
           const tag = displayedTags.find(t => t.id === body.label);
           if (tag) {
-            // Reset position if tag goes off-screen (keeps tags in viewport)
-            if (x < -100 || x > window.innerWidth + 100 || y > window.innerHeight + 100) {
-              Matter.Body.setPosition(body, {
-                x: Math.random() * (window.innerWidth - 200) + 100,
-                y: -100
-              });
-              Matter.Body.setVelocity(body, { x: 0, y: 0 });
-              Matter.Body.setAngularVelocity(body, 0);
-            }
             domNode.style.transform = `translate(${x - tag.width / 2}px, ${y - TAG_HEIGHT / 2}px) rotate(${rotation}rad)`;
           }
         }
