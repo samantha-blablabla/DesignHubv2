@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useEffect, useState, PropsWithChildren } from 'react';
+
+import React, { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react';
 import Lenis from 'lenis';
 import { motion, useScroll, useSpring } from 'framer-motion';
-import { globalScheduler } from '../lib/animationScheduler';
 
 // --- Context for Scroll Management ---
 interface ScrollContextType {
@@ -21,7 +21,7 @@ export const useLenis = () => useContext(ScrollContext);
 // --- Wrapper Component ---
 export const ScrollWrapper: React.FC<PropsWithChildren> = ({ children }) => {
   const [lenis, setLenis] = useState<Lenis | null>(null);
-  
+
   // Scroll Progress Indicator Logic
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
@@ -34,24 +34,24 @@ export const ScrollWrapper: React.FC<PropsWithChildren> = ({ children }) => {
     // Initialize Lenis with "Premium" Settings
     const lenisInstance = new Lenis({
       duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
       wheelMultiplier: 1,
       touchMultiplier: 2,
-      lerp: 0.1, // Task 3: Smoothness
+      lerp: 0.1, // Smoothness
     });
 
     setLenis(lenisInstance);
 
-    // Use unified scheduler instead of separate RAF loop
-    const unsubscribe = globalScheduler.subscribe('smooth-scroll', (time) => {
+    function raf(time: number) {
       lenisInstance.raf(time);
-    });
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
 
     return () => {
-      unsubscribe();
       lenisInstance.destroy();
     };
   }, []);

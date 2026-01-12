@@ -12,7 +12,7 @@ interface VideoItemProps {
   onHoverEnd: () => void;
 }
 
-const VideoItem: React.FC<VideoItemProps> = ({ item, isHovered, isAnyHovered, onHoverStart, onHoverEnd }) => {
+const VideoItem: React.FC<VideoItemProps> = React.memo(({ item, isHovered, isAnyHovered, onHoverStart, onHoverEnd }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { setCursor } = useCursor();
@@ -149,7 +149,7 @@ const VideoItem: React.FC<VideoItemProps> = ({ item, isHovered, isAnyHovered, on
       </div>
     </motion.a>
   );
-};
+});
 
 const SmartVideoGallery = () => {
   const [hoveredId, setHoveredId] = useState<number | null>(null);
@@ -158,6 +158,78 @@ const SmartVideoGallery = () => {
 
   // === CLAUDE CODE: Fetch motion assets from Supabase ===
   useEffect(() => {
+    // DEMO: Using dummy data instead of Supabase for testing
+    // Replace with Supabase fetch when database is ready
+    const DUMMY_VIDEOS: MotionAsset[] = [
+      {
+        id: 1,
+        title: 'Cosmic Nebula',
+        duration: '00:15',
+        thumb: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?auto=format&fit=crop&q=80&w=800',
+        video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+        link: '#project-nebula',
+        description: 'Abstract colorful ink spreading in water',
+        tags: ['abstract', 'fluid', 'colorful']
+      },
+      {
+        id: 2,
+        title: 'Digital Rain',
+        duration: '00:12',
+        thumb: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800',
+        video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+        link: '#project-rain',
+        description: 'Matrix-style digital code falling',
+        tags: ['digital', 'code', 'tech']
+      },
+      {
+        id: 3,
+        title: 'Particle Flow',
+        duration: '00:20',
+        thumb: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=800',
+        video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        link: '#project-particles',
+        description: 'Floating particles with depth and glow',
+        tags: ['particles', 'motion', 'glow']
+      },
+      {
+        id: 4,
+        title: 'Neon Waves',
+        duration: '00:18',
+        thumb: 'https://images.unsplash.com/photo-1557672172-298e090bd0f1?auto=format&fit=crop&q=80&w=800',
+        video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+        link: '#project-neon',
+        description: 'Vibrant neon waves in motion',
+        tags: ['neon', 'waves', 'vibrant']
+      },
+      {
+        id: 5,
+        title: 'Abstract Paint',
+        duration: '00:16',
+        thumb: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&q=80&w=800',
+        video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
+        link: '#project-paint',
+        description: 'Paint colors mixing and swirling',
+        tags: ['paint', 'mixing', 'fluid']
+      },
+      {
+        id: 6,
+        title: 'Smoke Art',
+        duration: '00:14',
+        thumb: 'https://images.unsplash.com/photo-1604533038676-e82df491c10d?auto=format&fit=crop&q=80&w=800',
+        video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
+        link: '#project-smoke',
+        description: 'Elegant smoke patterns in slow motion',
+        tags: ['smoke', 'elegant', 'slow-mo']
+      }
+    ];
+
+    // Simulate loading delay
+    setTimeout(() => {
+      setVideos(DUMMY_VIDEOS);
+      setLoading(false);
+    }, 500);
+
+    /* ORIGINAL SUPABASE CODE - Uncomment when database is ready:
     async function fetchMotionAssets() {
       try {
         setLoading(true);
@@ -176,6 +248,7 @@ const SmartVideoGallery = () => {
     }
 
     fetchMotionAssets();
+    */
   }, []);
 
   return (
