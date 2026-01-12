@@ -207,6 +207,8 @@ const HeroSection: React.FC = () => {
     }, 100); // Reduced from 1200ms to 100ms for instant drop
 
     // Use unified scheduler for DOM sync (Runner handles physics update)
+    console.log('[HeroSection] Subscribing to scheduler, displayedTags:', displayedTags.length);
+
     const unsubscribe = globalScheduler.subscribe('hero-physics', (time, delta) => {
       if (!engineRef.current) return;
 
@@ -218,8 +220,8 @@ const HeroSection: React.FC = () => {
         const domNode = tagsRef.current.get(body.label);
         if (domNode) {
           // Debug: Log first tag position to see if physics is working
-          if (body.label === 'ui-kits' && body.position.y > -100) {
-            console.log('Tag position:', body.position.y.toFixed(2), 'Gravity:', engineRef.current?.gravity.y);
+          if (body.label === 'ui-kits') {
+            console.log('Syncing tag:', body.label, 'y:', body.position.y.toFixed(2), 'Gravity:', engineRef.current?.gravity.y);
           }
           const { x, y } = body.position;
           const rotation = body.angle;
