@@ -16,26 +16,22 @@ type TagData = {
 };
 
 const TAGS: TagData[] = [
-  { id: 'ui-kits', label: 'UI Kits', bgClass: 'bg-yellow-500', textClass: 'text-black', width: 120 },
-  { id: 'figma', label: 'Figma', bgClass: 'bg-blue-500', textClass: 'text-white', width: 110 },
-  { id: 'icons', label: 'Icons', bgClass: 'bg-orange-500', textClass: 'text-white', width: 110 },
-  { id: '3d', label: '3D Models', bgClass: 'bg-purple-500', textClass: 'text-white', width: 155 },
-  { id: 'fonts', label: 'Fonts', bgClass: 'bg-green-500', textClass: 'text-black', width: 110 },
-  { id: 'mockups', label: 'Mockups', bgClass: 'bg-yellow-500', textClass: 'text-black', width: 135 },
-  { id: 'illustrations', label: 'Illustrations', bgClass: 'bg-blue-500', textClass: 'text-white', width: 165 },
-  { id: 'colors', label: 'Palettes', bgClass: 'bg-orange-500', textClass: 'text-white', width: 135 },
-  { id: 'textures', label: 'Textures', bgClass: 'bg-purple-500', textClass: 'text-white', width: 135 },
-  { id: 'templates', label: 'Templates', bgClass: 'bg-green-500', textClass: 'text-black', width: 150 },
-  { id: 'wireframes', label: 'Wireframes', bgClass: 'bg-yellow-500', textClass: 'text-black', width: 160 },
-  { id: 'brushes', label: 'Brushes', bgClass: 'bg-blue-500', textClass: 'text-white', width: 125 },
-  { id: 'photos', label: 'Photos', bgClass: 'bg-pink-500', textClass: 'text-white', width: 120 },
-  { id: 'videos', label: 'Videos', bgClass: 'bg-cyan-500', textClass: 'text-black', width: 120 },
-  { id: 'audio', label: 'Audio', bgClass: 'bg-teal-500', textClass: 'text-white', width: 110 },
-  { id: 'plugins', label: 'Plugins', bgClass: 'bg-red-500', textClass: 'text-white', width: 125 },
+  { id: 'ui-kits', label: 'UI Kits', bgClass: 'bg-yellow-500', textClass: 'text-black', width: 100 },
+  { id: 'figma', label: 'Figma', bgClass: 'bg-blue-500', textClass: 'text-white', width: 90 },
+  { id: 'icons', label: 'Icons', bgClass: 'bg-orange-500', textClass: 'text-white', width: 90 },
+  { id: '3d', label: '3D Models', bgClass: 'bg-purple-500', textClass: 'text-white', width: 135 },
+  { id: 'fonts', label: 'Fonts', bgClass: 'bg-green-500', textClass: 'text-black', width: 90 },
+  { id: 'mockups', label: 'Mockups', bgClass: 'bg-yellow-500', textClass: 'text-black', width: 115 },
+  { id: 'illustrations', label: 'Illustrations', bgClass: 'bg-blue-500', textClass: 'text-white', width: 145 },
+  { id: 'colors', label: 'Palettes', bgClass: 'bg-orange-500', textClass: 'text-white', width: 115 },
+  { id: 'textures', label: 'Textures', bgClass: 'bg-purple-500', textClass: 'text-white', width: 115 },
+  { id: 'templates', label: 'Templates', bgClass: 'bg-green-500', textClass: 'text-black', width: 130 },
+  { id: 'wireframes', label: 'Wireframes', bgClass: 'bg-yellow-500', textClass: 'text-black', width: 140 },
+  { id: 'brushes', label: 'Brushes', bgClass: 'bg-blue-500', textClass: 'text-white', width: 105 },
 ];
 
-const TAG_HEIGHT = 56; // Increased from 48 to 56 for more padding
-const CHAMFER_RADIUS = 28; // Adjusted proportionally
+const TAG_HEIGHT = 48;
+const CHAMFER_RADIUS = 24;
 
 // --- Magnetic Button Component ---
 
