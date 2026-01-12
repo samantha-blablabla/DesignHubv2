@@ -161,10 +161,10 @@ const HeroSection: React.FC = () => {
     const ceiling = Matter.Bodies.rectangle(window.innerWidth / 2, -50, window.innerWidth, 100, { isStatic: true });
     Matter.Composite.add(world, [ground, wallLeft, wallRight, ceiling]);
 
-    // 4. Bodies (Positioned high initially)
+    // 4. Bodies (Positioned close to viewport for instant visibility)
     const tagBodies = displayedTags.map((tag) => {
       const x = Math.random() * (window.innerWidth - 200) + 100;
-      const y = -Math.random() * 500 - 200; // Start higher
+      const y = -Math.random() * 100 - 50; // Much closer to screen
       return Matter.Bodies.rectangle(x, y, tag.width, TAG_HEIGHT, {
         chamfer: { radius: CHAMFER_RADIUS },
         restitution: 0.8,
@@ -200,15 +200,14 @@ const HeroSection: React.FC = () => {
     Matter.Render.run(render);
     runnerRef.current = runner;
 
-    // Staggered Gravity Enable - reduced delay for immediate effect
+    // Enable gravity immediately for instant drop
     setTimeout(() => {
-        engine.gravity.y = 1;
-        gravityInitialized.current = true; // Mark gravity as initialized
-    }, 100); // Reduced from 1200ms to 100ms for instant drop
+        engine.gravity.y = 2; // Increased from 1 to 2 for faster falling
+        gravityInitialized.current = true;
+        console.log('[HeroSection] Gravity enabled:', engine.gravity.y);
+    }, 50); // Almost instant
 
     // Use unified scheduler for DOM sync (Runner handles physics update)
-    console.log('[HeroSection] Subscribing to scheduler, displayedTags:', displayedTags.length);
-
     const unsubscribe = globalScheduler.subscribe('hero-physics', (time, delta) => {
       if (!engineRef.current) return;
 
@@ -219,10 +218,6 @@ const HeroSection: React.FC = () => {
       tagBodies.forEach((body) => {
         const domNode = tagsRef.current.get(body.label);
         if (domNode) {
-          // Debug: Log first tag position to see if physics is working
-          if (body.label === 'ui-kits') {
-            console.log('Syncing tag:', body.label, 'y:', body.position.y.toFixed(2), 'Gravity:', engineRef.current?.gravity.y);
-          }
           const { x, y } = body.position;
           const rotation = body.angle;
           const tag = displayedTags.find(t => t.id === body.label);
