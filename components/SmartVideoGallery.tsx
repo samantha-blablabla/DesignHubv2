@@ -163,63 +163,63 @@ const SmartVideoGallery = () => {
     const DUMMY_VIDEOS: MotionAsset[] = [
       {
         id: 1,
-        title: 'Abstract Ink Flow',
-        duration: '00:14',
-        thumb: 'https://images.pexels.com/photos/3137078/pexels-photo-3137078.jpeg?auto=compress&cs=tinysrgb&w=800',
-        video: 'https://videos.pexels.com/video-files/3255275/3255275-hd_1920_1080_30fps.mp4',
-        link: '#project-ink',
-        description: 'Mesmerizing ink swirls in water with vibrant colors',
-        tags: ['abstract', 'fluid', 'art']
+        title: 'Cosmic Nebula',
+        duration: '00:15',
+        thumb: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?auto=format&fit=crop&q=80&w=800',
+        video: 'https://cdn.coverr.co/videos/coverr-abstract-colorful-ink-in-water-7030/1080p.mp4',
+        link: '#project-nebula',
+        description: 'Abstract colorful ink spreading in water',
+        tags: ['abstract', 'fluid', 'colorful']
       },
       {
         id: 2,
-        title: 'Digital Particles',
-        duration: '00:20',
-        thumb: 'https://images.pexels.com/photos/2539462/pexels-photo-2539462.jpeg?auto=compress&cs=tinysrgb&w=800',
-        video: 'https://videos.pexels.com/video-files/3141207/3141207-hd_1920_1080_25fps.mp4',
-        link: '#project-particles',
-        description: 'Glowing digital particles flowing in space',
-        tags: ['particles', 'digital', 'motion']
+        title: 'Digital Rain',
+        duration: '00:12',
+        thumb: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800',
+        video: 'https://cdn.coverr.co/videos/coverr-matrix-style-binary-rain-9792/1080p.mp4',
+        link: '#project-rain',
+        description: 'Matrix-style digital code falling',
+        tags: ['digital', 'code', 'tech']
       },
       {
         id: 3,
-        title: 'Neon Waves',
-        duration: '00:15',
-        thumb: 'https://images.pexels.com/photos/1939485/pexels-photo-1939485.jpeg?auto=compress&cs=tinysrgb&w=800',
-        video: 'https://videos.pexels.com/video-files/3130284/3130284-hd_1920_1080_30fps.mp4',
-        link: '#project-neon',
-        description: 'Colorful neon light waves in motion',
-        tags: ['neon', 'waves', 'glow']
+        title: 'Particle Flow',
+        duration: '00:20',
+        thumb: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=800',
+        video: 'https://cdn.coverr.co/videos/coverr-particles-floating-in-the-air-8233/1080p.mp4',
+        link: '#project-particles',
+        description: 'Floating particles with depth and glow',
+        tags: ['particles', 'motion', 'glow']
       },
       {
         id: 4,
-        title: 'Smoke Motion',
-        duration: '00:12',
-        thumb: 'https://images.pexels.com/photos/1591447/pexels-photo-1591447.jpeg?auto=compress&cs=tinysrgb&w=800',
-        video: 'https://videos.pexels.com/video-files/2635812/2635812-hd_1920_1080_24fps.mp4',
-        link: '#project-smoke',
-        description: 'Ethereal smoke flowing gracefully',
-        tags: ['smoke', 'ethereal', 'flow']
+        title: 'Neon Waves',
+        duration: '00:18',
+        thumb: 'https://images.unsplash.com/photo-1557672172-298e090bd0f1?auto=format&fit=crop&q=80&w=800',
+        video: 'https://cdn.coverr.co/videos/coverr-colorful-neon-waves-animation-2735/1080p.mp4',
+        link: '#project-neon',
+        description: 'Vibrant neon waves in motion',
+        tags: ['neon', 'waves', 'vibrant']
       },
       {
         id: 5,
-        title: 'Liquid Gold',
-        duration: '00:18',
-        thumb: 'https://images.pexels.com/photos/4667220/pexels-photo-4667220.jpeg?auto=compress&cs=tinysrgb&w=800',
-        video: 'https://videos.pexels.com/video-files/3196465/3196465-hd_1920_1080_24fps.mp4',
-        link: '#project-gold',
-        description: 'Golden liquid paint flowing and mixing',
-        tags: ['liquid', 'gold', 'paint']
+        title: 'Abstract Paint',
+        duration: '00:16',
+        thumb: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&q=80&w=800',
+        video: 'https://cdn.coverr.co/videos/coverr-paint-mixing-in-water-6333/1080p.mp4',
+        link: '#project-paint',
+        description: 'Paint colors mixing and swirling',
+        tags: ['paint', 'mixing', 'fluid']
       },
       {
         id: 6,
-        title: 'Abstract Geometry',
-        duration: '00:16',
-        thumb: 'https://images.pexels.com/photos/3532544/pexels-photo-3532544.jpeg?auto=compress&cs=tinysrgb&w=800',
-        video: 'https://videos.pexels.com/video-files/3129957/3129957-hd_1920_1080_30fps.mp4',
-        link: '#project-geometry',
-        description: 'Geometric shapes morphing in 3D space',
-        tags: ['geometry', '3d', 'abstract']
+        title: 'Smoke Art',
+        duration: '00:14',
+        thumb: 'https://images.unsplash.com/photo-1604533038676-e82df491c10d?auto=format&fit=crop&q=80&w=800',
+        video: 'https://cdn.coverr.co/videos/coverr-smoke-in-slow-motion-3563/1080p.mp4',
+        link: '#project-smoke',
+        description: 'Elegant smoke patterns in slow motion',
+        tags: ['smoke', 'elegant', 'slow-mo']
       }
     ];
 

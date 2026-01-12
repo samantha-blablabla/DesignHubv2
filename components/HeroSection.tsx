@@ -28,6 +28,10 @@ const TAGS: TagData[] = [
   { id: 'templates', label: 'Templates', bgClass: 'bg-green-500', textClass: 'text-black', width: 150 },
   { id: 'wireframes', label: 'Wireframes', bgClass: 'bg-yellow-500', textClass: 'text-black', width: 160 },
   { id: 'brushes', label: 'Brushes', bgClass: 'bg-blue-500', textClass: 'text-white', width: 125 },
+  { id: 'photos', label: 'Photos', bgClass: 'bg-pink-500', textClass: 'text-white', width: 120 },
+  { id: 'videos', label: 'Videos', bgClass: 'bg-cyan-500', textClass: 'text-black', width: 120 },
+  { id: 'audio', label: 'Audio', bgClass: 'bg-teal-500', textClass: 'text-white', width: 110 },
+  { id: 'plugins', label: 'Plugins', bgClass: 'bg-red-500', textClass: 'text-white', width: 125 },
 ];
 
 const TAG_HEIGHT = 56; // Increased from 48 to 56 for more padding
@@ -152,11 +156,12 @@ const HeroSection: React.FC = () => {
     render.canvas.style.pointerEvents = 'none';
     render.canvas.style.opacity = '0';
 
-    // 3. Boundaries
+    // 3. Boundaries (with reset zones)
     const ground = Matter.Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 50, window.innerWidth, 100, { isStatic: true });
     const wallLeft = Matter.Bodies.rectangle(-50, window.innerHeight / 2, 100, window.innerHeight, { isStatic: true });
     const wallRight = Matter.Bodies.rectangle(window.innerWidth + 50, window.innerHeight / 2, 100, window.innerHeight, { isStatic: true });
-    Matter.Composite.add(world, [ground, wallLeft, wallRight]);
+    const ceiling = Matter.Bodies.rectangle(window.innerWidth / 2, -50, window.innerWidth, 100, { isStatic: true });
+    Matter.Composite.add(world, [ground, wallLeft, wallRight, ceiling]);
 
     // 4. Bodies (Positioned high initially)
     const tagBodies = displayedTags.map((tag) => {
@@ -215,6 +220,15 @@ const HeroSection: React.FC = () => {
           const rotation = body.angle;
           const tag = displayedTags.find(t => t.id === body.label);
           if (tag) {
+            // Reset position if tag goes off-screen (keeps tags in viewport)
+            if (x < -100 || x > window.innerWidth + 100 || y > window.innerHeight + 100) {
+              Matter.Body.setPosition(body, {
+                x: Math.random() * (window.innerWidth - 200) + 100,
+                y: -100
+              });
+              Matter.Body.setVelocity(body, { x: 0, y: 0 });
+              Matter.Body.setAngularVelocity(body, 0);
+            }
             domNode.style.transform = `translate(${x - tag.width / 2}px, ${y - TAG_HEIGHT / 2}px) rotate(${rotation}rad)`;
           }
         }
