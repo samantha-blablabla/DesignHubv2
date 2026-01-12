@@ -4,78 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cyberpunk Design Hub</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap');
-      
-      html.lenis, html.lenis body {
-        height: auto;
-      }
-
-      .lenis.lenis-smooth {
-        scroll-behavior: auto !important;
-      }
-
-      .lenis.lenis-smooth [data-lenis-prevent] {
-        overscroll-behavior: contain;
-      }
-
-      .lenis.lenis-stopped {
-        overflow: hidden;
-      }
-
-      .lenis.lenis-scrolling iframe {
-        pointer-events: none;
-      }
-
-      body {
-        font-family: 'Bricolage Grotesque', sans-serif;
-        background-color: #060606;
-        margin: 0;
-        /* Revert overflow-x: hidden on body if it conflicts, but usually needed for x-overflow prevention */
-        overflow-x: hidden;
-        cursor: default;
-      }
-
-      /* Custom Neon Scrollbar */
-      ::-webkit-scrollbar {
-        width: 6px;
-        height: 6px; /* Ensures horizontal scrollbars also match the style if visible */
-      }
-      ::-webkit-scrollbar-track {
-        background: #060606;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #eab308; /* Yellow-500 */
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #facc15;
-      }
-
-      /* Utility to hide scrollbar */
-      .no-scrollbar::-webkit-scrollbar {
-        display: none !important;
-      }
-      .no-scrollbar {
-        -ms-overflow-style: none;  /* IE and Edge */
-        scrollbar-width: none;  /* Firefox */
-      }
-    </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
-    "framer-motion": "https://esm.sh/framer-motion@^12.25.0",
-    "matter-js": "https://esm.sh/matter-js@^0.20.0",
-    "lenis": "https://esm.sh/@studio-freight/lenis@1.0.42"
-  }
-}
-</script>
-</head>
+  </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>

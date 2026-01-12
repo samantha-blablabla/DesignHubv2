@@ -18,7 +18,8 @@
       "Bash(git log:*)",
       "Bash(git push:*)",
       "Bash(wrangler --version:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(export CLOUDFLARE_API_TOKEN=xwb2COfeL5l3TMs1SBhBpkvVI2VF-VUvpYinXRo9:*)"
     ]
   }
 }
