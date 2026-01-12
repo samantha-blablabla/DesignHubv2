@@ -166,7 +166,7 @@ const SmartVideoGallery = () => {
         title: 'Cosmic Nebula',
         duration: '00:15',
         thumb: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?auto=format&fit=crop&q=80&w=800',
-        video: 'https://cdn.coverr.co/videos/coverr-abstract-colorful-ink-in-water-7030/1080p.mp4',
+        video: 'https://cdn.pixabay.com/video/2020/02/17/32368-393033905_large.mp4',
         link: '#project-nebula',
         description: 'Abstract colorful ink spreading in water',
         tags: ['abstract', 'fluid', 'colorful']
@@ -176,7 +176,7 @@ const SmartVideoGallery = () => {
         title: 'Digital Rain',
         duration: '00:12',
         thumb: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800',
-        video: 'https://cdn.coverr.co/videos/coverr-matrix-style-binary-rain-9792/1080p.mp4',
+        video: 'https://cdn.pixabay.com/video/2023/01/27/148421-794003381_large.mp4',
         link: '#project-rain',
         description: 'Matrix-style digital code falling',
         tags: ['digital', 'code', 'tech']
@@ -186,7 +186,7 @@ const SmartVideoGallery = () => {
         title: 'Particle Flow',
         duration: '00:20',
         thumb: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=800',
-        video: 'https://cdn.coverr.co/videos/coverr-particles-floating-in-the-air-8233/1080p.mp4',
+        video: 'https://cdn.pixabay.com/video/2022/11/29/141799-777229260_large.mp4',
         link: '#project-particles',
         description: 'Floating particles with depth and glow',
         tags: ['particles', 'motion', 'glow']
@@ -196,7 +196,7 @@ const SmartVideoGallery = () => {
         title: 'Neon Waves',
         duration: '00:18',
         thumb: 'https://images.unsplash.com/photo-1557672172-298e090bd0f1?auto=format&fit=crop&q=80&w=800',
-        video: 'https://cdn.coverr.co/videos/coverr-colorful-neon-waves-animation-2735/1080p.mp4',
+        video: 'https://cdn.pixabay.com/video/2021/08/12/85465-588738932_large.mp4',
         link: '#project-neon',
         description: 'Vibrant neon waves in motion',
         tags: ['neon', 'waves', 'vibrant']
@@ -206,7 +206,7 @@ const SmartVideoGallery = () => {
         title: 'Abstract Paint',
         duration: '00:16',
         thumb: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&q=80&w=800',
-        video: 'https://cdn.coverr.co/videos/coverr-paint-mixing-in-water-6333/1080p.mp4',
+        video: 'https://cdn.pixabay.com/video/2020/03/16/34089-400031926_large.mp4',
         link: '#project-paint',
         description: 'Paint colors mixing and swirling',
         tags: ['paint', 'mixing', 'fluid']
@@ -216,7 +216,7 @@ const SmartVideoGallery = () => {
         title: 'Smoke Art',
         duration: '00:14',
         thumb: 'https://images.unsplash.com/photo-1604533038676-e82df491c10d?auto=format&fit=crop&q=80&w=800',
-        video: 'https://cdn.coverr.co/videos/coverr-smoke-in-slow-motion-3563/1080p.mp4',
+        video: 'https://cdn.pixabay.com/video/2019/08/30/26313-358561033_large.mp4',
         link: '#project-smoke',
         description: 'Elegant smoke patterns in slow motion',
         tags: ['smoke', 'elegant', 'slow-mo']

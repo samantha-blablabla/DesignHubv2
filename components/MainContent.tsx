@@ -134,6 +134,7 @@ const TiltCard: React.FC<TiltCardProps> = React.memo(({ resource, index }) => {
     }
   };
 
+  // Pattern: 3 regular + 1 wide (indexes 3, 7, 11, 15, 19...)
   const isFeatured = (index + 1) % 4 === 0;
 
   return (
@@ -143,7 +144,7 @@ const TiltCard: React.FC<TiltCardProps> = React.memo(({ resource, index }) => {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.3 }}
-      className={`relative group ${isFeatured ? 'md:col-span-2' : 'col-span-1'} h-[340px] perspective-1000`}
+      className={`relative group ${isFeatured ? 'md:col-span-2 lg:col-span-3' : 'col-span-1'} h-[340px] perspective-1000`}
       style={{ perspective: 1000 }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
