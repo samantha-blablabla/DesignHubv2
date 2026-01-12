@@ -120,19 +120,16 @@ const HeroSection: React.FC = () => {
   }, []);
 
   // Gate physics engine based on visibility for performance
-  // NOTE: Since we use unified scheduler, we don't need Runner.run/stop
-  // The scheduler will continue to call our update function
-  // We can disable gravity to "pause" physics simulation instead
   useEffect(() => {
-    if (!engineRef.current) return;
+    if (!runnerRef.current || !engineRef.current) return;
     if (!gravityInitialized.current) return; // Don't gate before initial animation
 
     if (isHeroVisible) {
-      // Resume physics by enabling gravity
-      engineRef.current.gravity.y = 1;
+      // Resume physics when visible
+      Matter.Runner.run(runnerRef.current, engineRef.current);
     } else {
-      // Pause physics by disabling gravity (objects stay still)
-      engineRef.current.gravity.y = 0;
+      // Pause physics when off-screen (huge performance save)
+      Matter.Runner.stop(runnerRef.current);
     }
   }, [isHeroVisible]);
 
@@ -201,8 +198,9 @@ const HeroSection: React.FC = () => {
 
     // 6. Run & Sync
     const runner = Matter.Runner.create();
-    // NOTE: Don't use Matter.Runner.run() - we manually update via globalScheduler
-    // Matter.Runner.run(runner, engine); // REMOVED - conflicts with unified scheduler
+    // NOTE: We use BOTH Runner and scheduler temporarily for debugging
+    // The Runner provides automatic updates, scheduler syncs DOM
+    Matter.Runner.run(runner, engine);
     Matter.Render.run(render);
     runnerRef.current = runner;
 
@@ -212,12 +210,12 @@ const HeroSection: React.FC = () => {
         gravityInitialized.current = true; // Mark gravity as initialized
     }, 1200);
 
-    // Use unified scheduler instead of separate RAF loop
+    // Use unified scheduler for DOM sync (Runner handles physics update)
     const unsubscribe = globalScheduler.subscribe('hero-physics', (time, delta) => {
       if (!engineRef.current) return;
 
-      // Update physics with accurate delta time (Matter.js expects milliseconds)
-      Matter.Engine.update(engine, delta);
+      // NOTE: Matter.Runner is already updating the engine
+      // We just sync DOM positions here
 
       // Sync DOM with physics state - batched in single frame
       tagBodies.forEach((body) => {
