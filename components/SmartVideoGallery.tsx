@@ -12,7 +12,7 @@ interface VideoItemProps {
   onHoverEnd: () => void;
 }
 
-const VideoItem: React.FC<VideoItemProps> = ({ item, isHovered, isAnyHovered, onHoverStart, onHoverEnd }) => {
+const VideoItem: React.FC<VideoItemProps> = React.memo(({ item, isHovered, isAnyHovered, onHoverStart, onHoverEnd }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { setCursor } = useCursor();
@@ -149,7 +149,7 @@ const VideoItem: React.FC<VideoItemProps> = ({ item, isHovered, isAnyHovered, on
       </div>
     </motion.a>
   );
-};
+});
 
 const SmartVideoGallery = () => {
   const [hoveredId, setHoveredId] = useState<number | null>(null);

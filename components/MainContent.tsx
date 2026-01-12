@@ -83,7 +83,7 @@ interface TiltCardProps {
   index: number;
 }
 
-const TiltCard: React.FC<TiltCardProps> = ({ resource, index }) => {
+const TiltCard: React.FC<TiltCardProps> = React.memo(({ resource, index }) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const mouseX = useSpring(x, { stiffness: 150, damping: 15 });
@@ -175,7 +175,7 @@ const TiltCard: React.FC<TiltCardProps> = ({ resource, index }) => {
       </motion.div>
     </motion.div>
   );
-};
+});
 
 const MainContent = () => {
   const [activeCategory, setActiveCategory] = useState<Category>('All');

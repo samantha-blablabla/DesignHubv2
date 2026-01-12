@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 import { useCursor } from './CursorContext';
+import { globalScheduler } from '../lib/animationScheduler';
 
 const CustomCursor = () => {
   const { cursorState } = useCursor();
@@ -12,15 +13,29 @@ const CustomCursor = () => {
   const smoothX = useSpring(mouseX, springConfig);
   const smoothY = useSpring(mouseY, springConfig);
 
+  // Store pending mouse position to batch updates per frame
+  const pendingPosition = useRef({ x: 0, y: 0 });
+
+  // Throttle mouse updates to once per frame
+  const manageMouseMove = useCallback((e: MouseEvent) => {
+    pendingPosition.current = { x: e.clientX, y: e.clientY };
+  }, []);
+
   useEffect(() => {
-    const manageMouseMove = (e: MouseEvent) => {
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
-    };
+    // Subscribe to unified scheduler for batched updates
+    const unsubscribe = globalScheduler.subscribe('custom-cursor', () => {
+      // Update motion values once per frame instead of every mouse pixel
+      mouseX.set(pendingPosition.current.x);
+      mouseY.set(pendingPosition.current.y);
+    });
 
     window.addEventListener('mousemove', manageMouseMove);
-    return () => window.removeEventListener('mousemove', manageMouseMove);
-  }, [mouseX, mouseY]);
+
+    return () => {
+      unsubscribe();
+      window.removeEventListener('mousemove', manageMouseMove);
+    };
+  }, [mouseX, mouseY, manageMouseMove]);
 
   const variants = {
     default: {

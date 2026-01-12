@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Matter from 'matter-js';
-import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
+import { motion, useScroll, useTransform, useMotionValue, useSpring, useInView } from 'framer-motion';
 import { ArrowDown, Search, Menu, Zap, Users } from 'lucide-react';
 import { useCursor } from './CursorContext';
+import { globalScheduler } from '../lib/animationScheduler';
 
 // --- Types & Constants ---
 
@@ -40,7 +41,7 @@ interface MagneticButtonProps {
   onClick?: () => void;
 }
 
-const MagneticButton: React.FC<MagneticButtonProps> = ({ children, className = "", onClick }) => {
+const MagneticButton: React.FC<MagneticButtonProps> = React.memo(({ children, className = "", onClick }) => {
   const ref = useRef<HTMLButtonElement>(null);
   
   const x = useMotionValue(0);
@@ -85,7 +86,7 @@ const MagneticButton: React.FC<MagneticButtonProps> = ({ children, className = "
       </motion.div>
     </motion.button>
   );
-};
+});
 
 const HeroSection: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -98,6 +99,9 @@ const HeroSection: React.FC = () => {
   const [displayedTags, setDisplayedTags] = useState<TagData[]>([]);
   const { setCursor } = useCursor();
 
+  // --- Intersection Observer for performance gating ---
+  const isHeroVisible = useInView(containerRef, { amount: 0.1 });
+
   // --- Parallax Hooks ---
   const { scrollY } = useScroll();
   const textY = useTransform(scrollY, [0, 500], [0, 200]);
@@ -109,6 +113,19 @@ const HeroSection: React.FC = () => {
     const isMobile = window.innerWidth < 768;
     setDisplayedTags(isMobile ? TAGS.slice(0, 6) : TAGS);
   }, []);
+
+  // Gate physics engine based on visibility for performance
+  useEffect(() => {
+    if (!runnerRef.current || !engineRef.current) return;
+
+    if (isHeroVisible) {
+      // Resume physics when hero comes into view
+      Matter.Runner.run(runnerRef.current, engineRef.current);
+    } else {
+      // Pause physics when hero scrolled out of view (huge performance save!)
+      Matter.Runner.stop(runnerRef.current);
+    }
+  }, [isHeroVisible]);
 
   useEffect(() => {
     if (!sceneRef.current || !containerRef.current || displayedTags.length === 0) return;
@@ -183,8 +200,14 @@ const HeroSection: React.FC = () => {
         engine.gravity.y = 1;
     }, 1200);
 
-    const updateLoop = () => {
+    // Use unified scheduler instead of separate RAF loop
+    const unsubscribe = globalScheduler.subscribe('hero-physics', (time, delta) => {
       if (!engineRef.current) return;
+
+      // Update physics with accurate delta time (Matter.js expects milliseconds)
+      Matter.Engine.update(engine, delta);
+
+      // Sync DOM with physics state - batched in single frame
       tagBodies.forEach((body) => {
         const domNode = tagsRef.current.get(body.label);
         if (domNode) {
@@ -196,9 +219,8 @@ const HeroSection: React.FC = () => {
           }
         }
       });
-      requestAnimationFrame(updateLoop);
-    };
-    const animationId = requestAnimationFrame(updateLoop);
+    });
+
     setIsLoaded(true);
 
     const handleResize = () => {
@@ -211,7 +233,7 @@ const HeroSection: React.FC = () => {
 
     return () => {
       window.removeEventListener('resize', handleResize);
-      cancelAnimationFrame(animationId);
+      unsubscribe(); // Cleanup scheduler subscription instead of RAF
       Matter.Render.stop(render);
       Matter.Runner.stop(runner);
       if (render.canvas) render.canvas.remove();
