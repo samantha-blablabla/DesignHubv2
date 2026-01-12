@@ -4,18 +4,22 @@ import { Search, ArrowUpRight } from 'lucide-react';
 import { useCursor } from './CursorContext';
 import SmartVideoGallery from './SmartVideoGallery';
 import BigFooter from './BigFooter';
+import ResourceModal from './ResourceModal';
 
 // --- Types & Data ---
 
 type Category = 'All' | 'Icons' | 'Colors' | 'Fonts' | 'Illustrations' | 'UI Kits' | 'Utilities';
 
 interface Resource {
-  id: string;
+  id: string | number;
   title: string;
   category: Category;
   image: string;
+  thumbnail?: string; // For modal compatibility
   description: string;
   color: string;
+  link?: string; // For modal
+  tags?: string[]; // For modal
 }
 
 const CATEGORIES: Category[] = ['All', 'UI Kits', 'Icons', 'Fonts', 'Illustrations', 'Colors', 'Utilities'];
@@ -99,9 +103,10 @@ const MagneticButton: React.FC<MagneticButtonProps> = ({ children, className = "
 interface TiltCardProps {
   resource: Resource;
   index: number;
+  onClick?: (resource: Resource) => void;
 }
 
-const TiltCard: React.FC<TiltCardProps> = React.memo(({ resource, index }) => {
+const TiltCard: React.FC<TiltCardProps> = React.memo(({ resource, index, onClick }) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const mouseX = useSpring(x, { stiffness: 150, damping: 15 });
@@ -187,7 +192,10 @@ const TiltCard: React.FC<TiltCardProps> = React.memo(({ resource, index }) => {
         </div>
 
         <div className="absolute top-4 right-4 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
-           <MagneticButton className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center shadow-lg hover:bg-slate-200 transition-colors cursor-pointer">
+           <MagneticButton
+             className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center shadow-lg hover:bg-slate-200 transition-colors cursor-pointer"
+             onClick={() => onClick?.(resource)}
+           >
               <ArrowUpRight className="w-5 h-5" />
            </MagneticButton>
         </div>
@@ -199,8 +207,30 @@ const TiltCard: React.FC<TiltCardProps> = React.memo(({ resource, index }) => {
 const MainContent = () => {
   const [activeCategory, setActiveCategory] = useState<Category>('All');
   const [isScrolled, setIsScrolled] = useState(false);
+  const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { scrollY } = useScroll();
   const { setCursor } = useCursor();
+
+  const handleOpenModal = (resource: Resource) => {
+    // Convert to modal format
+    const modalResource = {
+      id: typeof resource.id === 'string' ? parseInt(resource.id) : resource.id,
+      title: resource.title,
+      description: resource.description,
+      category: resource.category,
+      thumbnail: resource.thumbnail || resource.image,
+      link: resource.link || '#',
+      tags: resource.tags || [resource.category.toLowerCase()]
+    };
+    setSelectedResource(modalResource as any);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setTimeout(() => setSelectedResource(null), 300); // Delay clearing to allow exit animation
+  };
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsScrolled(latest > 100);
@@ -258,7 +288,12 @@ const MainContent = () => {
          <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
            <AnimatePresence mode='popLayout'>
              {filteredResources.map((resource, i) => (
-               <TiltCard key={resource.id} resource={resource} index={i} />
+               <TiltCard
+                 key={resource.id}
+                 resource={resource}
+                 index={i}
+                 onClick={handleOpenModal}
+               />
              ))}
            </AnimatePresence>
          </motion.div>
@@ -269,6 +304,13 @@ const MainContent = () => {
 
        {/* Big Urban Footer */}
        <BigFooter />
+
+       {/* Resource Modal */}
+       <ResourceModal
+         resource={selectedResource}
+         isOpen={isModalOpen}
+         onClose={handleCloseModal}
+       />
     </div>
   );
 };

@@ -101,6 +101,7 @@ const HeroSection: React.FC = () => {
   const clickStartRef = useRef<{x: number, y: number} | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [displayedTags, setDisplayedTags] = useState<TagData[]>([]);
+  const gravityInitialized = useRef(false);
   const { setCursor } = useCursor();
 
   // --- Intersection Observer for performance gating ---
@@ -119,15 +120,18 @@ const HeroSection: React.FC = () => {
   }, []);
 
   // Gate physics engine based on visibility for performance
+  // NOTE: Since we use unified scheduler, we don't need Runner.run/stop
+  // The scheduler will continue to call our update function
+  // We can disable gravity to "pause" physics simulation instead
   useEffect(() => {
-    if (!runnerRef.current || !engineRef.current) return;
+    if (!engineRef.current || !gravityInitialized.current) return;
 
     if (isHeroVisible) {
-      // Resume physics when hero comes into view
-      Matter.Runner.run(runnerRef.current, engineRef.current);
+      // Resume physics by enabling gravity
+      engineRef.current.gravity.y = 1;
     } else {
-      // Pause physics when hero scrolled out of view (huge performance save!)
-      Matter.Runner.stop(runnerRef.current);
+      // Pause physics by disabling gravity (objects stay still)
+      engineRef.current.gravity.y = 0;
     }
   }, [isHeroVisible]);
 
@@ -196,13 +200,15 @@ const HeroSection: React.FC = () => {
 
     // 6. Run & Sync
     const runner = Matter.Runner.create();
-    Matter.Runner.run(runner, engine);
+    // NOTE: Don't use Matter.Runner.run() - we manually update via globalScheduler
+    // Matter.Runner.run(runner, engine); // REMOVED - conflicts with unified scheduler
     Matter.Render.run(render);
     runnerRef.current = runner;
 
     // Staggered Gravity Enable
     setTimeout(() => {
         engine.gravity.y = 1;
+        gravityInitialized.current = true; // Mark gravity as initialized
     }, 1200);
 
     // Use unified scheduler instead of separate RAF loop
