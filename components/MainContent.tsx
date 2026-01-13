@@ -247,6 +247,7 @@ const MainContent = () => {
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [displayCount, setDisplayCount] = useState(12); // Start with 12 items
+  const [searchQuery, setSearchQuery] = useState(''); // Search state
   const { scrollY } = useScroll();
   const { setCursor } = useCursor();
 
@@ -274,14 +275,27 @@ const MainContent = () => {
     setIsScrolled(latest > 100);
   });
 
-  const filteredResources = activeCategory === 'All'
+  // Filter by category
+  const categoryFiltered = activeCategory === 'All'
     ? RESOURCES
     : RESOURCES.filter(r => r.category === activeCategory);
 
-  // Reset display count when category changes
+  // Filter by search query
+  const filteredResources = searchQuery.trim() === ''
+    ? categoryFiltered
+    : categoryFiltered.filter(resource => {
+        const query = searchQuery.toLowerCase();
+        return (
+          resource.title.toLowerCase().includes(query) ||
+          resource.description.toLowerCase().includes(query) ||
+          resource.tags.some(tag => tag.toLowerCase().includes(query))
+        );
+      });
+
+  // Reset display count when category or search changes
   useEffect(() => {
     setDisplayCount(12);
-  }, [activeCategory]);
+  }, [activeCategory, searchQuery]);
 
   // Slice resources for pagination
   const displayedResources = filteredResources.slice(0, displayCount);
@@ -326,43 +340,79 @@ const MainContent = () => {
            {/* Search */}
            <div className="flex items-center gap-3 bg-white/5 border border-white/5 rounded-full px-4 py-2 w-full md:w-auto">
               <Search className="w-4 h-4 text-slate-500" />
-              <input 
-                placeholder="Search resources..." 
+              <input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search resources..."
                 className="bg-transparent border-none outline-none text-sm text-white placeholder-slate-500 w-full md:w-48"
               />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="text-slate-400 hover:text-white transition-colors"
+                  aria-label="Clear search"
+                >
+                  ×
+                </button>
+              )}
            </div>
          </div>
        </div>
 
        {/* Gallery Grid */}
        <div className="max-w-7xl mx-auto px-6 mt-8 mb-32">
-         <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
-           <AnimatePresence mode='popLayout'>
-             {displayedResources.map((resource, i) => (
-               <TiltCard
-                 key={resource.id}
-                 resource={resource}
-                 index={i}
-                 onClick={handleOpenModal}
-               />
-             ))}
-           </AnimatePresence>
-         </motion.div>
-
-         {/* Load More Button */}
-         {hasMore && (
+         {filteredResources.length === 0 ? (
+           /* No Results Message */
            <motion.div
-             className="flex justify-center mt-12"
+             className="text-center py-20"
              initial={{ opacity: 0, y: 20 }}
              animate={{ opacity: 1, y: 0 }}
-             transition={{ delay: 0.2 }}
            >
-             <MagneticButton onClick={handleLoadMore}>
-               <span className="relative z-10 text-lg font-semibold">
-                 Load More ({filteredResources.length - displayCount} remaining)
-               </span>
-             </MagneticButton>
+             <div className="text-6xl mb-4">🔍</div>
+             <h3 className="text-2xl font-bold text-white mb-2">No results found</h3>
+             <p className="text-slate-400 mb-6">
+               Try adjusting your search or filters
+             </p>
+             {searchQuery && (
+               <button
+                 onClick={() => setSearchQuery('')}
+                 className="px-6 py-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
+               >
+                 Clear Search
+               </button>
+             )}
            </motion.div>
+         ) : (
+           <>
+             <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
+               <AnimatePresence mode='popLayout'>
+                 {displayedResources.map((resource, i) => (
+                   <TiltCard
+                     key={resource.id}
+                     resource={resource}
+                     index={i}
+                     onClick={handleOpenModal}
+                   />
+                 ))}
+               </AnimatePresence>
+             </motion.div>
+
+             {/* Load More Button */}
+             {hasMore && (
+               <motion.div
+                 className="flex justify-center mt-12"
+                 initial={{ opacity: 0, y: 20 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 transition={{ delay: 0.2 }}
+               >
+                 <MagneticButton onClick={handleLoadMore}>
+                   <span className="relative z-10 text-lg font-semibold">
+                     Load More ({filteredResources.length - displayCount} remaining)
+                   </span>
+                 </MagneticButton>
+               </motion.div>
+             )}
+           </>
          )}
        </div>
        
