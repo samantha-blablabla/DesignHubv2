@@ -95,17 +95,28 @@ const BigFooter = () => {
         </div>
       </div>
 
-      {/* Massive Text */}
+      {/* Scrolling Massive Text */}
       <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none select-none pointer-events-none z-0 opacity-10">
-          <h1 
-            className="text-[18vw] md:text-[15.5vw] font-black text-transparent w-full text-center whitespace-nowrap translate-y-[10%]"
-            style={{ 
-                WebkitTextStroke: '1px rgba(255,255,255,0.1)',
-                fontFamily: '"Bricolage Grotesque", sans-serif'
-            }}
-          >
-            DESIGNHUB
-          </h1>
+          <div className="flex animate-marquee whitespace-nowrap">
+            <h1
+              className="text-[18vw] md:text-[15.5vw] font-black text-transparent inline-block translate-y-[10%]"
+              style={{
+                  WebkitTextStroke: '1px rgba(255,255,255,0.1)',
+                  fontFamily: '"Bricolage Grotesque", sans-serif'
+              }}
+            >
+              DISCOVER • CREATE • INSPIRE •&nbsp;
+            </h1>
+            <h1
+              className="text-[18vw] md:text-[15.5vw] font-black text-transparent inline-block translate-y-[10%]"
+              style={{
+                  WebkitTextStroke: '1px rgba(255,255,255,0.1)',
+                  fontFamily: '"Bricolage Grotesque", sans-serif'
+              }}
+            >
+              DISCOVER • CREATE • INSPIRE •&nbsp;
+            </h1>
+          </div>
       </div>
       
       {/* Copyright */}
