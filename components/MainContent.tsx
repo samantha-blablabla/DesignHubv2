@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useMotionValueEvent, useScroll } from 'framer-motion';
-import { Search, ArrowUpRight } from 'lucide-react';
+import { Search, ArrowUpRight, Heart } from 'lucide-react';
 import { useCursor } from './CursorContext';
 import SmartVideoGallery from './SmartVideoGallery';
 import BigFooter from './BigFooter';
@@ -8,7 +8,7 @@ import ResourceModal from './ResourceModal';
 
 // --- Types & Data ---
 
-type Category = 'All' | 'Icons' | 'Colors' | 'Fonts' | 'Illustrations' | 'UI Kits' | 'Utilities';
+type Category = 'All' | 'Favorites' | 'Icons' | 'Colors' | 'Fonts' | 'Illustrations' | 'UI Kits' | 'Utilities';
 
 interface Resource {
   id: string | number;
@@ -22,7 +22,7 @@ interface Resource {
   tags?: string[]; // For modal
 }
 
-const CATEGORIES: Category[] = ['All', 'UI Kits', 'Icons', 'Fonts', 'Illustrations', 'Colors', 'Utilities'];
+const CATEGORIES: Category[] = ['All', 'Favorites', 'UI Kits', 'Icons', 'Fonts', 'Illustrations', 'Colors', 'Utilities'];
 
 const RESOURCES: Resource[] = [
   // === UI KITS === (10 items)
@@ -141,9 +141,11 @@ interface TiltCardProps {
   resource: Resource;
   index: number;
   onClick?: (resource: Resource) => void;
+  isFavorite: boolean;
+  onToggleFavorite: (id: string | number) => void;
 }
 
-const TiltCard: React.FC<TiltCardProps> = React.memo(({ resource, index, onClick }) => {
+const TiltCard: React.FC<TiltCardProps> = React.memo(({ resource, index, onClick, isFavorite, onToggleFavorite }) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const mouseX = useSpring(x, { stiffness: 150, damping: 15 });
@@ -228,6 +230,24 @@ const TiltCard: React.FC<TiltCardProps> = React.memo(({ resource, index, onClick
           </div>
         </div>
 
+        {/* Favorite Button - Top Left */}
+        <div className="absolute top-4 left-4 z-30">
+          <motion.button
+            className={`w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 pointer-events-auto ${
+              isFavorite ? 'bg-red-500 text-white' : 'bg-white/10 backdrop-blur-sm text-white hover:bg-white/20'
+            }`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFavorite(resource.id);
+            }}
+            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.1 }}
+          >
+            <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
+          </motion.button>
+        </div>
+
+        {/* View Button - Top Right */}
         <div className="absolute top-4 right-4 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
            <MagneticButton
              className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center shadow-lg hover:bg-slate-200 transition-colors cursor-pointer"
@@ -248,6 +268,14 @@ const MainContent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [displayCount, setDisplayCount] = useState(12); // Start with 12 items
   const [searchQuery, setSearchQuery] = useState(''); // Search state
+  const [favorites, setFavorites] = useState<Set<string | number>>(() => {
+    // Load favorites from localStorage on mount
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('designhub-favorites');
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    }
+    return new Set();
+  });
   const { scrollY } = useScroll();
   const { setCursor } = useCursor();
 
@@ -271,14 +299,29 @@ const MainContent = () => {
     setTimeout(() => setSelectedResource(null), 300); // Delay clearing to allow exit animation
   };
 
+  const toggleFavorite = (resourceId: string | number) => {
+    setFavorites(prev => {
+      const newFavorites = new Set(prev);
+      if (newFavorites.has(resourceId)) {
+        newFavorites.delete(resourceId);
+      } else {
+        newFavorites.add(resourceId);
+      }
+      // Save to localStorage
+      localStorage.setItem('designhub-favorites', JSON.stringify([...newFavorites]));
+      return newFavorites;
+    });
+  };
+
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsScrolled(latest > 100);
   });
 
   // Filter by category
-  const categoryFiltered = activeCategory === 'All'
-    ? RESOURCES
-    : RESOURCES.filter(r => r.category === activeCategory);
+  const categoryFiltered =
+    activeCategory === 'All' ? RESOURCES :
+    activeCategory === 'Favorites' ? RESOURCES.filter(r => favorites.has(r.id)) :
+    RESOURCES.filter(r => r.category === activeCategory);
 
   // Filter by search query
   const filteredResources = searchQuery.trim() === ''
@@ -392,6 +435,8 @@ const MainContent = () => {
                      resource={resource}
                      index={i}
                      onClick={handleOpenModal}
+                     isFavorite={favorites.has(resource.id)}
+                     onToggleFavorite={toggleFavorite}
                    />
                  ))}
                </AnimatePresence>
