@@ -358,7 +358,7 @@ const MainContent = () => {
              transition={{ delay: 0.2 }}
            >
              <MagneticButton onClick={handleLoadMore}>
-               <span className="relative z-10">
+               <span className="relative z-10 text-lg font-semibold">
                  Load More ({filteredResources.length - displayCount} remaining)
                </span>
              </MagneticButton>
