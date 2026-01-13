@@ -9,7 +9,12 @@
       "Bash(npm run build:*)",
       "Bash(wrangler pages deployment create:*)",
       "Bash(git add:*)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "Bash(taskkill /F /FI \"WINDOWTITLE eq npm*\")",
+      "Bash(pkill:*)",
+      "Bash(wrangler whoami:*)",
+      "Bash(wrangler login:*)",
+      "Bash(del nul)"
     ]
   }
 }
