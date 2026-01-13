@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useMotionValueEvent, useScroll } from 'framer-motion';
 import { Search, ArrowUpRight } from 'lucide-react';
 import { useCursor } from './CursorContext';
@@ -246,6 +246,7 @@ const MainContent = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [displayCount, setDisplayCount] = useState(12); // Start with 12 items
   const { scrollY } = useScroll();
   const { setCursor } = useCursor();
 
@@ -273,9 +274,22 @@ const MainContent = () => {
     setIsScrolled(latest > 100);
   });
 
-  const filteredResources = activeCategory === 'All' 
-    ? RESOURCES 
+  const filteredResources = activeCategory === 'All'
+    ? RESOURCES
     : RESOURCES.filter(r => r.category === activeCategory);
+
+  // Reset display count when category changes
+  useEffect(() => {
+    setDisplayCount(12);
+  }, [activeCategory]);
+
+  // Slice resources for pagination
+  const displayedResources = filteredResources.slice(0, displayCount);
+  const hasMore = displayCount < filteredResources.length;
+
+  const handleLoadMore = () => {
+    setDisplayCount(prev => prev + 12);
+  };
 
   return (
     <div className="relative w-full min-h-screen bg-[#060606] text-white selection:bg-yellow-500 selection:text-black pb-0">
@@ -324,7 +338,7 @@ const MainContent = () => {
        <div className="max-w-7xl mx-auto px-6 mt-8 mb-32">
          <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
            <AnimatePresence mode='popLayout'>
-             {filteredResources.map((resource, i) => (
+             {displayedResources.map((resource, i) => (
                <TiltCard
                  key={resource.id}
                  resource={resource}
@@ -334,6 +348,22 @@ const MainContent = () => {
              ))}
            </AnimatePresence>
          </motion.div>
+
+         {/* Load More Button */}
+         {hasMore && (
+           <motion.div
+             className="flex justify-center mt-12"
+             initial={{ opacity: 0, y: 20 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ delay: 0.2 }}
+           >
+             <MagneticButton onClick={handleLoadMore}>
+               <span className="relative z-10">
+                 Load More ({filteredResources.length - displayCount} remaining)
+               </span>
+             </MagneticButton>
+           </motion.div>
+         )}
        </div>
        
        {/* Smart Video Showcase */}
