@@ -24,8 +24,8 @@ const BigFooter = () => {
     const { setCursor } = useCursor();
 
   return (
-    <footer className="relative bg-[#060606] pt-12 md:pt-20 pb-0 overflow-hidden border-t border-white/5">
-      <div className="max-w-7xl mx-auto px-6 relative z-10 pb-24 md:pb-40">
+    <footer className="relative bg-[#060606] pt-20 md:pt-32 pb-0 overflow-hidden border-t border-white/5">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 pb-32 md:pb-48">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-12 text-center md:text-left">
           
           {/* Brand/Newsletter Column - Centered on mobile */}
@@ -96,21 +96,19 @@ const BigFooter = () => {
       </div>
 
       {/* Scrolling Massive Text */}
-      <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none select-none pointer-events-none z-0 opacity-10">
+      <div className="absolute bottom-12 left-0 w-full overflow-hidden leading-none select-none pointer-events-none z-0">
           <div className="flex animate-marquee whitespace-nowrap">
             <h1
-              className="text-[18vw] md:text-[15.5vw] font-black text-transparent inline-block translate-y-[10%]"
+              className="text-[16vw] md:text-[12vw] font-black text-white/[0.03] inline-block"
               style={{
-                  WebkitTextStroke: '1px rgba(255,255,255,0.1)',
                   fontFamily: '"Bricolage Grotesque", sans-serif'
               }}
             >
               DISCOVER • CREATE • INSPIRE •&nbsp;
             </h1>
             <h1
-              className="text-[18vw] md:text-[15.5vw] font-black text-transparent inline-block translate-y-[10%]"
+              className="text-[16vw] md:text-[12vw] font-black text-white/[0.03] inline-block"
               style={{
-                  WebkitTextStroke: '1px rgba(255,255,255,0.1)',
                   fontFamily: '"Bricolage Grotesque", sans-serif'
               }}
             >
@@ -120,8 +118,8 @@ const BigFooter = () => {
       </div>
       
       {/* Copyright */}
-      <div className="relative z-10 border-t border-white/5 py-6 text-center bg-[#060606]/50 backdrop-blur-sm">
-         <p className="text-slate-600 text-xs">© 2024 DesignHub. Built for the community.</p>
+      <div className="relative z-10 py-8 text-center bg-[#060606]/50 backdrop-blur-sm">
+         <p className="text-slate-600 text-xs">© 2026 DesignHub. Built for the community.</p>
       </div>
     </footer>
   );
